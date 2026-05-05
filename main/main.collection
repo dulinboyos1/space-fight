@@ -1,2 +1,16 @@
 name: "main"
 scale_along_z: 0
+embedded_instances {
+  id: "controller"
+  data: "components {\n"
+  "  id: \"main\"\n"
+  "  component: \"/main/main.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"main-menu\"\n"
+  "  type: \"collectionproxy\"\n"
+  "  data: \"collection: \\\"/main/main-menu/main-menu.collection\\\"\\n"
+  "\"\n"
+  "}\n"
+  ""
+}

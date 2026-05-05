@@ -1,0 +1,19 @@
+function init(self)
+	msg.post("@render:", "use_fixed_fit_projection", { near = -1, far = 1}) -- Set the redered to maintain aspect ratio
+	msg.post("#main-menu", "load") -- Start main menu loading	
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("proxy_loaded") then -- A proxy has finished loading
+		msg.post(sender, "init") -- Initialise it
+		msg.post(sender, "enable") -- Enable it
+	elseif message_id == hash("load") then
+		-- Load a new proxy
+		msg.post("#"+message.collection, "load")
+	elseif message_id == hash("unload") then
+		-- Disable and unload a proxy
+		msg.post("#"+message.collection, "disable")
+		msg.post("#"+message.collection, "final")
+		msg.post("#"+message.collection, "unload")
+	end
+end
