@@ -1,0 +1,4 @@
+images {
+  image: "/assets/Menu Highlighter.png"
+}
+extrude_borders: 2

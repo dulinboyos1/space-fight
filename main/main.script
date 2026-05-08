@@ -1,5 +1,7 @@
 function init(self)
-	msg.post("@render:", "use_fixed_fit_projection", { near = -1, far = 1}) -- Set the redered to maintain aspect ratio
+	-- Set the redered to maintain aspect ratio and expand to fill the screen
+	msg.post("@render:", "use_fixed_fit_projection", { near = -1, far = 1})
+	
 	msg.post("#main-menu", "load") -- Start main menu loading	
 end
 
@@ -13,7 +15,7 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == hash("unload") then
 		-- Disable and unload a proxy
 		msg.post("#"+message.collection, "disable")
-		msg.post("#"+message.collection, "final")
+		msg.post("#"+message.collection, "final") -- Finalise the proxy, by running all final() functions.
 		msg.post("#"+message.collection, "unload")
 	end
 end

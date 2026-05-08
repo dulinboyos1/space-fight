@@ -1,0 +1,37 @@
+function init(self)
+	self.index = {0,0}
+	self.grid = {{0}}
+	self.started = false
+end
+
+local function move_to(self, position)
+	self.index = position
+
+	local new_pos = self.grid[position[1]][position[2]].position
+	local new_size = self.grid[position[1]][position[2]].size
+
+	go.set_position(new_position)
+	go.set("#sprite","size", new_size)
+end
+
+local function start_grid(self, layout)	
+	for name, data in pairs(layout.layout) do -- For each layout entry get it's name and value
+		self.grid[data.index[1]][data.index[2]] = { -- Put in the grid under the index coordinates
+			name = name, -- The name
+			size = data.size, -- Size (vector3)
+			position = data.position -- And Position (vector3)
+		}
+	end
+
+	move_to(self,layout.metadata.starting_index) -- Set the starting position from the message
+
+	self.started = true
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("start") then
+		start_grid(self, message)
+	elseif self.started == false then -- If not started end early
+		return
+	elseif
+end

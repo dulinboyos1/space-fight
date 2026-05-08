@@ -1,6 +1,16 @@
 images {
-  image: "/assets/Main Menu Backgroud.png"
-  pivot_x: 0.0
-  pivot_y: 1.0
+  image: "/assets/Background.png"
+}
+images {
+  image: "/assets/Settings Button.png"
+}
+images {
+  image: "/assets/Start Button.png"
+}
+images {
+  image: "/assets/Border.png"
+}
+images {
+  image: "/assets/Quit Button.png"
 }
 extrude_borders: 2

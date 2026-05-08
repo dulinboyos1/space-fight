@@ -1,0 +1,35 @@
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	-- Initalise the menu layout
+	---
+	---   [ play ]
+	--- [ settings ]
+	---   [ quit ]
+	---
+	self.layout = {
+		metadata = {
+			starting_index = {0 , 0}
+		},
+		layout = {
+			play = {
+				index = {0 , 0},
+				position = vmath.vector3(1450.0, 1150.0),
+				size = vmath.vector3(824, 289)
+			},
+			settings = {
+				index = {0 , 1},
+				position = vmath.vector3(1450.0, 850.0),
+				size = vmath.vector3(824, 289)
+			},
+			quit = {
+				index = {0 , 2},
+				position = vmath.vector3(1450.0, 550.0),
+				size = vmath.vector3(824, 289)
+			}
+		}
+	}
+	
+	msg.post("/menu-navigator#controller.script", "start", self.layout)
+	
+end
