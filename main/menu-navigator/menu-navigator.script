@@ -1,21 +1,35 @@
 function init(self)
 	self.index = {0,0}
-	self.grid = {{0}}
+	self.grid = {{}}
 	self.started = false
 end
 
-local function move_to(self, position)
-	self.index = position
+local function grid_get(self, index)
+	-- This function is for conviniece and gets the properties from the grid using the index vector
+	return self.grid[index[1]][index[2]]
+end
 
-	local new_pos = self.grid[position[1]][position[2]].position
-	local new_size = self.grid[position[1]][position[2]].size
+local function move_to(self, new_index)
+	 -- This function converts an object index to a position and size and then moves the GO
+	self.index = new_index
 
-	go.set_position(new_position)
+	print("moving to ", new_index)
+
+	local new_pos = grid_get(self,new_index).position
+	local new_size = grid_get(self,new_index).size
+
+	go.set_position(new_pos)
 	go.set("#sprite","size", new_size)
 end
 
 local function start_grid(self, layout)	
+	self.grid = {{nil} * layour.metadata.size[1]} * layout.metadata.size[2]
+	
 	for name, data in pairs(layout.layout) do -- For each layout entry get it's name and value
+		print("creating: ",name)
+		print(data.index[1], data.index[2])
+		print(data.size)
+		print(data.position)
 		self.grid[data.index[1]][data.index[2]] = { -- Put in the grid under the index coordinates
 			name = name, -- The name
 			size = data.size, -- Size (vector3)
@@ -23,15 +37,51 @@ local function start_grid(self, layout)
 		}
 	end
 
+	print("grid started")
+	print(self.grid)
+
 	move_to(self,layout.metadata.starting_index) -- Set the starting position from the message
 
-	self.started = true
+	self.started = true -- Set the started flag ready for the next message
+end
+
+local function find_next(self, direction)
+	-- This function finds the next available space (not nil) in the direction provided
+	-- It does this by moving in the direction and then if it does not find something it moves sideways till it does,
+	-- There will never be an empty row
+	local found = self.index + direction
+
+	local count = 1
+	while grid_get(self, found) == nil do -- If the target grid is empty
+		if grid_get(self, found + {count, 0}) ~= nil then -- Check left
+			found = found + {count, 0}
+		elseif grid_get(self, found - {count, 0}) ~= nil then -- Check right
+			found = found - {count, 0}
+		end
+		if count > 10 then
+			return nil -- Safety break incase search finds nothing
+		end
+		count = count + 1 -- Expand the search in both directions
+	end
+	
+
+	return found
 end
 
 function on_message(self, message_id, message, sender)
-	if message_id == hash("start") then
+	if message_id == hash("start") then -- The start message will just call the start function
 		start_grid(self, message)
 	elseif self.started == false then -- If not started end early
 		return
-	elseif
+	elseif message_id == hash("up") then
+		move_to(self, find_next(self, {0,1})) -- Set position to be one above current position
+	elseif message_id == hash("down") then
+		move_to(self, find_next(self, {0,-1}))
+	elseif message_id == hash("left") then
+		move_to(self, find_next(self, {1,0}))
+	elseif message_id == hash("right") then
+		move_to(self, find_next(self, {-1,0}))
+	elseif message_id == hash("select") then
+		msg.post(sender, "navigator_select", {selected = grid_get(self, self.index).name})
+	end
 end

@@ -1,3 +1,7 @@
+components {
+  id: "menu-navigator"
+  component: "/main/menu-navigator/menu-navigator.script"
+}
 embedded_components {
   id: "sprite"
   type: "sprite"
