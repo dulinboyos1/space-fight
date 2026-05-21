@@ -23,4 +23,7 @@ embedded_components {
   "  texture: \"/main/menu-navigator/menu-navigator.atlas\"\n"
   "}\n"
   ""
+  position {
+    z: 0.1
+  }
 }
