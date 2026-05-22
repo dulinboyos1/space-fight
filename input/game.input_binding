@@ -10,3 +10,7 @@ gamepad_trigger {
   input: GAMEPAD_RPAD_DOWN
   action: "A"
 }
+gamepad_trigger {
+  input: GAMEPAD_RPAD_RIGHT
+  action: "B"
+}

@@ -1,0 +1,13 @@
+images {
+  image: "/assets/Background.png"
+}
+images {
+  image: "/assets/Border.png"
+}
+images {
+  image: "/assets/Black Box.png"
+}
+images {
+  image: "/assets/Back Indicator.png"
+}
+extrude_borders: 2

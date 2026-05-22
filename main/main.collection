@@ -12,5 +12,11 @@ embedded_instances {
   "  data: \"collection: \\\"/main/main-menu/main-menu.collection\\\"\\n"
   "\"\n"
   "}\n"
+  "embedded_components {\n"
+  "  id: \"start-menu\"\n"
+  "  type: \"collectionproxy\"\n"
+  "  data: \"collection: \\\"/main/start-menu/start-menu.collection\\\"\\n"
+  "\"\n"
+  "}\n"
   ""
 }

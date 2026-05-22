@@ -21,7 +21,7 @@ embedded_instances {
   "material: \\\"/builtins/materials/sprite.material\\\"\\n"
   "textures {\\n"
   "  sampler: \\\"texture_sampler\\\"\\n"
-  "  texture: \\\"/main/main-menu/main-menu.atlas\\\"\\n"
+  "  texture: \\\"/main/common.atlas\\\"\\n"
   "}\\n"
   "\"\n"
   "}\n"
@@ -36,11 +36,11 @@ embedded_instances {
   "}\\n"
   "textures {\\n"
   "  sampler: \\\"texture_sampler\\\"\\n"
-  "  texture: \\\"/main/main-menu/main-menu.atlas\\\"\\n"
+  "  texture: \\\"/main/common.atlas\\\"\\n"
   "}\\n"
   "\"\n"
   "  scale {\n"
-  "    x: 1.01\n"
+  "    x: 0.95\n"
   "    y: 1.01\n"
   "  }\n"
   "}\n"
@@ -103,5 +103,6 @@ embedded_instances {
   position {
     x: 1450.0
     y: 850.0
+    z: 0.1
   }
 }
