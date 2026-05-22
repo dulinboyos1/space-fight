@@ -1,12 +1,12 @@
-key_trigger {
-  input: KEY_W
-  action: "up"
+gamepad_trigger {
+  input: GAMEPAD_LSTICK_UP
+  action: "Lstick_up"
 }
-key_trigger {
-  input: KEY_S
-  action: "down"
+gamepad_trigger {
+  input: GAMEPAD_LSTICK_DOWN
+  action: "Lstick_down"
 }
-key_trigger {
-  input: KEY_ENTER
-  action: "enter"
+gamepad_trigger {
+  input: GAMEPAD_RPAD_DOWN
+  action: "A"
 }
