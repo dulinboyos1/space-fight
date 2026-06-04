@@ -2,18 +2,23 @@ function init(self)
 	self.index = {0,0}
 	self.grid = {{}}
 	self.started = false
+	self.hidden = false
 	self.size = {0,0}
 end
 
 local function grid_get(self, index)
 	-- This function is for conviniece and gets the properties from the grid using the index vector
 
+	if index == nil then -- Stop if index is nil
+		return
+	end
+	
 	return self.grid[index[1]][index[2]]
 end
 
 local function move_to(self, new_index)
 	-- This function converts an object index to a position and size and then moves the GO
-	-- If the index is nil then maintain the current index and do nothing
+	-- If the index is nil or 0,0 then maintain the current index and do nothing
 	if new_index ~= nil then
 		self.index = new_index
 	else
@@ -28,12 +33,21 @@ local function move_to(self, new_index)
 	go.set("#sprite","size", new_size)
 end
 
-local function start_grid(self, layout)	
+local function hide(self, hidden)
+	self.hidden = hidden
+	if hidden then
+		msg.post("#sprite", "disable")
+	else
+		msg.post("#sprite", "enable")
+	end
+end
+
+local function parse_grid(self, layout)
 	for i = 1, layout.metadata.size[1] do
 		self.grid[i] = {}
 	end
 	self.size = layout.metadata.size
-	
+
 	for name, data in pairs(layout.layout) do -- For each layout entry get it's name and value
 		self.grid[data.index[1]][data.index[2]] = { -- Put in the grid under the index coordinates
 			name = name, -- The name
@@ -42,9 +56,27 @@ local function start_grid(self, layout)
 		}
 	end
 
+	move_to(self,layout.metadata.starting_index) -- Set the starting position from the message
+
+	if layout.metadata.hidden then -- Hide
+		hide(self, true)
+	end
+
+end
+
+local function update_grid(self, layout)
+	parse_grid(self,layout)
+end
+
+local function start_grid(self, layout)	
+	parse_grid(self,layout)
 
 	move_to(self,layout.metadata.starting_index) -- Set the starting position from the message
 
+	if layout.metadata.hidden then -- Hide
+		hide(self, true)
+	end
+	
 	self.started = true -- Set the started flag ready for the next message
 end
 
@@ -88,6 +120,10 @@ function on_message(self, message_id, message, sender)
 		move_to(self, find_next(self, {-1,0}))
 	elseif message_id == hash("right") then
 		move_to(self, find_next(self, {1,0}))
+	elseif message_id == hash("hide") then
+		hide(self, message.hidden)
+	elseif message_id == hash("update") then
+		update_grid(self, message)
 	elseif message_id == hash("select") then
 		msg.post(sender, "navigator_select", {selected = grid_get(self, self.index).name})
 	end

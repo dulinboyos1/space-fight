@@ -1,3 +1,19 @@
+key_trigger {
+  input: KEY_W
+  action: "Lstick_up"
+}
+key_trigger {
+  input: KEY_S
+  action: "Lstick_down"
+}
+key_trigger {
+  input: KEY_ENTER
+  action: "A"
+}
+key_trigger {
+  input: KEY_ESC
+  action: "B"
+}
 gamepad_trigger {
   input: GAMEPAD_LSTICK_UP
   action: "Lstick_up"

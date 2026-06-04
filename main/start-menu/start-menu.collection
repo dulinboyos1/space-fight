@@ -1,4 +1,8 @@
 name: "start-menu"
+instances {
+  id: "menu-navigator"
+  prototype: "/main/menu-navigator/menu-navigator.go"
+}
 scale_along_z: 0
 embedded_instances {
   id: "background"
@@ -118,6 +122,12 @@ embedded_instances {
   "  sampler: \\\"texture_sampler\\\"\\n"
   "  texture: \\\"/main/start-menu/start-menu.atlas\\\"\\n"
   "}\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"entry-factory\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/main/start-menu/player-list-entry.go\\\"\\n"
   "\"\n"
   "}\n"
   ""
