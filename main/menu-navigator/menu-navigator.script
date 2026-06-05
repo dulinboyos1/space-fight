@@ -1,5 +1,5 @@
 function init(self)
-	self.index = {0,0}
+	self.index = {1,1}
 	self.grid = {{}}
 	self.started = false
 	self.hidden = false
@@ -17,28 +17,29 @@ local function grid_get(self, index)
 end
 
 local function move_to(self, new_index)
-	-- This function converts an object index to a position and size and then moves the GO
-	-- If the index is nil or 0,0 then maintain the current index and do nothing
-	if new_index ~= nil then
+	-- This function disables the current border and moves to the new border
+	-- If the index is nil then maintain the current index and don't disable any borders
+	-- If the index is the current index don't disable and then enable it
+	print("moving to: ",new_index[1],",",new_index[2])
+	if new_index ~= nil and not (self.index[1] == new_index[1] and self.index[2] == new_index[2]) then
+		print("hiding: ",self.index[1],",",self.index[2])
+		msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "disable")
 		self.index = new_index
-	else
-		return
 	end
-	
 
-	local new_pos = grid_get(self,self.index).position
-	local new_size = grid_get(self,self.index).size
-
-	go.set_position(new_pos)
-	go.set("#sprite","size", new_size)
+	print("showing: ",self.index[1],",",self.index[2]," : ",grid_get(self,self.index).object)
+	msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "enable")
 end
 
 local function hide(self, hidden)
+	if self.size[1] == 0 or self.size[2] == 0 then
+		return -- If the size is 0 there is nothing to hide
+	end
 	self.hidden = hidden
 	if hidden then
-		msg.post("#sprite", "disable")
+		msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "disable")
 	else
-		msg.post("#sprite", "enable")
+		msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "enable")
 	end
 end
 
@@ -49,19 +50,19 @@ local function parse_grid(self, layout)
 	self.size = layout.metadata.size
 
 	for name, data in pairs(layout.layout) do -- For each layout entry get it's name and value
+		print("creating ",name)
+		msg.post(msg.url(nil, data.object, "menu-border"), "disable") -- Hide all menu border to start with
 		self.grid[data.index[1]][data.index[2]] = { -- Put in the grid under the index coordinates
 			name = name, -- The name
-			size = data.size, -- Size (vector3)
-			position = data.position -- And Position (vector3)
+			object = data.object, -- A URL for the object which is being selected
 		}
 	end
 
-	move_to(self,layout.metadata.starting_index) -- Set the starting position from the message
-
-	if layout.metadata.hidden then -- Hide
-		hide(self, true)
+	if layout.metadata.starting_index ~= nil then
+		move_to(self,layout.metadata.starting_index) -- Set the starting position from the message
 	end
-
+	
+	hide(self, layout.metadata.hidden)
 end
 
 local function update_grid(self, layout)
@@ -70,12 +71,6 @@ end
 
 local function start_grid(self, layout)	
 	parse_grid(self,layout)
-
-	move_to(self,layout.metadata.starting_index) -- Set the starting position from the message
-
-	if layout.metadata.hidden then -- Hide
-		hide(self, true)
-	end
 	
 	self.started = true -- Set the started flag ready for the next message
 end
@@ -86,7 +81,7 @@ local function find_next(self, direction)
 	-- There will never be an empty row
 	local found = {self.index[1] + direction[1], self.index[2] + direction[2]}
 
-	if found[1] < 0 or found[1] > self.size[1] or found[2] > self.size[2] or found[2] < 0 then
+	if found[1] <= 0 or found[1] > self.size[1] or found[2] > self.size[2] or found[2] <= 0 then
 		return nil -- If the target extends outside the grid imediately return nil
 	end	
 	
@@ -112,19 +107,19 @@ function on_message(self, message_id, message, sender)
 		start_grid(self, message)
 	elseif self.started == false then -- If not started end early
 		return
-	elseif message_id == hash("up") then
+	elseif message_id == hash("up") and not self.hidden then
 		move_to(self, find_next(self, {0,-1})) -- Set position to be one above current position
-	elseif message_id == hash("down") then
+	elseif message_id == hash("down") and not self.hidden then
 		move_to(self, find_next(self, {0,1}))
-	elseif message_id == hash("left") then
+	elseif message_id == hash("left") and not self.hidden then
 		move_to(self, find_next(self, {-1,0}))
-	elseif message_id == hash("right") then
+	elseif message_id == hash("right") and not self.hidden then
 		move_to(self, find_next(self, {1,0}))
 	elseif message_id == hash("hide") then
 		hide(self, message.hidden)
 	elseif message_id == hash("update") then
 		update_grid(self, message)
-	elseif message_id == hash("select") then
+	elseif message_id == hash("select") and not self.hidden then
 		msg.post(sender, "navigator_select", {selected = grid_get(self, self.index).name})
 	end
 end

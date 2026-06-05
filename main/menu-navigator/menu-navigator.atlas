@@ -1,4 +1,7 @@
 images {
   image: "/assets/Menu Highlighter.png"
 }
+images {
+  image: "/assets/Remove Button Highlighter.png"
+}
 extrude_borders: 2

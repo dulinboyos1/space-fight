@@ -30,3 +30,18 @@ embedded_components {
     z: 5.5
   }
 }
+embedded_components {
+  id: "menu-border"
+  type: "sprite"
+  data: "default_animation: \"Remove Button Highlighter\"\n"
+  "material: \"/builtins/materials/sprite.material\"\n"
+  "textures {\n"
+  "  sampler: \"texture_sampler\"\n"
+  "  texture: \"/main/menu-navigator/menu-navigator.atlas\"\n"
+  "}\n"
+  ""
+  position {
+    x: 1302.0
+    y: 1.0
+  }
+}
