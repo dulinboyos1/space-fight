@@ -20,14 +20,10 @@ local function move_to(self, new_index)
 	-- This function disables the current border and moves to the new border
 	-- If the index is nil then maintain the current index and don't disable any borders
 	-- If the index is the current index don't disable and then enable it
-	print("moving to: ",new_index[1],",",new_index[2])
 	if new_index ~= nil and not (self.index[1] == new_index[1] and self.index[2] == new_index[2]) then
-		print("hiding: ",self.index[1],",",self.index[2])
 		msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "disable")
 		self.index = new_index
 	end
-
-	print("showing: ",self.index[1],",",self.index[2]," : ",grid_get(self,self.index).object)
 	msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "enable")
 end
 
@@ -50,7 +46,6 @@ local function parse_grid(self, layout)
 	self.size = layout.metadata.size
 
 	for name, data in pairs(layout.layout) do -- For each layout entry get it's name and value
-		print("creating ",name)
 		msg.post(msg.url(nil, data.object, "menu-border"), "disable") -- Hide all menu border to start with
 		self.grid[data.index[1]][data.index[2]] = { -- Put in the grid under the index coordinates
 			name = name, -- The name
