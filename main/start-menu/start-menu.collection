@@ -145,3 +145,40 @@ embedded_instances {
   "}\n"
   ""
 }
+embedded_instances {
+  id: "play"
+  data: "embedded_components {\n"
+  "  id: \"play-button\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"Play Button\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/start-menu/start-menu.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"menu-border\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"Menu Highlighter\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/menu-navigator/menu-navigator.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "  position {\n"
+  "    y: 8.0\n"
+  "  }\n"
+  "  scale {\n"
+  "    y: 0.975\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 1400.0
+    y: 150.0
+    z: 0.1
+  }
+}
