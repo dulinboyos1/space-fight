@@ -1,9 +1,12 @@
+local defaultColour = vmath.vector4(0.8, 0.95, 1, 1)
+
 function init(self)
 	self.index = {1,1}
 	self.grid = {{}}
 	self.started = false
 	self.hidden = false
 	self.size = {0,0}
+	self.colour = defaultColour
 end
 
 local function grid_get(self, index)
@@ -25,6 +28,7 @@ local function move_to(self, new_index)
 		self.index = new_index
 	end
 	msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "enable")
+	go.set(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "tint", self.colour)
 end
 
 local function hide(self, hidden)
@@ -36,6 +40,7 @@ local function hide(self, hidden)
 		msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "disable")
 	else
 		msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "enable")
+		go.set(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "tint", self.colour)
 	end
 end
 
@@ -102,13 +107,19 @@ function on_message(self, message_id, message, sender)
 		start_grid(self, message)
 	elseif self.started == false then -- If not started end early
 		return
-	elseif message_id == hash("up") and not self.hidden then
+	end
+	if message.colour == "defualt" then
+		self.colour = defaultColour
+	elseif message.colour ~= nil then
+		self.colour = message.colour
+	end
+	if message_id == hash("up") and not self.hidden then
 		move_to(self, find_next(self, {0,-1})) -- Set position to be one above current position
 	elseif message_id == hash("down") and not self.hidden then
 		move_to(self, find_next(self, {0,1}))
 	elseif message_id == hash("left") and not self.hidden then
 		move_to(self, find_next(self, {-1,0}))
-	elseif message_id == hash("right") and not self.hidden then
+	elseif message_id == hash("right") and not self.hidden then	
 		move_to(self, find_next(self, {1,0}))
 	elseif message_id == hash("hide") then
 		hide(self, message.hidden)
