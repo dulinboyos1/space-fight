@@ -1,0 +1,33 @@
+
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	self.players = {} -- A table of players
+
+	msg.post("#map-proxy","load")
+
+end
+function on_message(self, message_id, message, sender)
+	if message_id == hash("init_parameters") then
+		-- Players is in the form
+		-- {
+		-- 	<gamepad> = {
+		-- 	  number = int
+		--    colour = {r,g,b}
+		--    label = <invalid>
+		-- 	}
+		-- }
+		print("Recived Parameters")
+		for gamepad_id, player in pairs(message.players) do
+			print("- - - -")
+			print("id = "..gamepad_id)
+			print("number = "..player.number)
+			print("colour = "..table.concat(player.colour, ","))
+		end
+	elseif message_id == hash("proxy_loaded") then
+		msg.post(sender, "init")
+		msg.post(sender, "enable")
+		msg.post("map:/controller", "load_map", {mapname = "map1"})
+	end
+end

@@ -2,10 +2,8 @@ images {
   image: "/assets/Background.png"
 }
 images {
-  image: "/assets/Border.png"
-}
-images {
   image: "/assets/Black Box.png"
+  pivot_x: 0.0
 }
 images {
   image: "/assets/Back Indicator.png"

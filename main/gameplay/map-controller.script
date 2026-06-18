@@ -1,0 +1,41 @@
+-- A short lived map controlling script, designed to be destroyed after each round
+
+local TimerLabel = "/countdown#countdown-label"
+local Countdown = "/countdown"
+local BlankTint = vmath.vector4(1, 1, 1, 0.4)
+
+local function next_second(self, handle, elapsed_time)
+	if self.currentSecond <= 1 then
+		msg.post(Countdown, "disable") -- If time is 0 disable the countdown
+	else
+		self.currentSecond = self.currentSecond - 1
+		label.set_text(TimerLabel, tostring(self.currentSecond))
+	end
+end
+
+local function start_countdown(self)
+	self.currentSecond = 3
+	msg.post(Countdown, "enable")
+	go.set(Countdown.."#sprite", "tint", BlankTint)
+	label.set_text(TimerLabel, tostring(self.currentSecond))
+	timer.delay(1, true, next_second)
+end
+
+local function load_map(name)
+	collectionfactory.set_prototype("#map-factory", "/main/gameplay/maps/"..name..".collectionc")
+	collectionfactory.create("#map-factory")
+end
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	self.players = {} -- A table of players
+
+	start_countdown(self)
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("load_map") then
+		load_map(message.mapname)
+	end
+end

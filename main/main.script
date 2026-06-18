@@ -5,14 +5,21 @@
 	msg.post("#main-menu", "load") -- Start main menu loading
 
 	msg.post(".", "acquire_input_focus")
+	self.loader = nil
+	self.target = nil
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("proxy_loaded") then -- A proxy has finished loading
 		msg.post(sender, "init") -- Initialise it
 		msg.post(sender, "enable") -- Enable it
+		if self.loader then
+			msg.post(self.loader, "proxy_loaded", {proxy = self.target})
+		end
 	elseif message_id == hash("load") then
 		-- Load a new proxy
+		self.loader = sender
+		self.target = message.collection
 		msg.post("#"..message.collection, "load")
 	elseif message_id == hash("unload") then
 		-- Disable and unload a proxy
