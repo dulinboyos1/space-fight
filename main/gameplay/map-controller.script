@@ -35,7 +35,12 @@ function init(self)
 end
 
 function on_message(self, message_id, message, sender)
+	print("map message recived")
 	if message_id == hash("load_map") then
 		load_map(message.mapname)
+	elseif message_id == hash("spawn_character") then
+		self.players[message.number] = collectionfactory.create("#character-factory",vmath.vector3(100, 100, 0), vmath.quat(), message.character, vmath.vector3(0.25,0.25,0.25))
+	elseif message_id == hash("force_property") then
+		go.set(self.players[message.number], message.property, message.value)
 	end
 end

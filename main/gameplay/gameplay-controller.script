@@ -1,13 +1,37 @@
+local function load_map(map_name)
+	msg.post("map:/controller", "load_map", {mapname = map_name})
+end
 
+local function spawn_players(self)
+	print("Spawing players")
+	for i, player in ipairs(self.players) do
+		print("Sending Message")
+		msg.post(player.id, "spawn_character", {mapURL = "map:/controller"})
+	end
+end
+
+local function start_players(self, message)
+	for gamepad_id, player in pairs(message.players) do
+		
+		local id = factory.create("#player-factory", vmath.vector3(), vmath.quat(), {
+			number = player.number,
+			gamepad_id = gamepad_id,
+			colour = vmath.vector4(player.colour[1], player.colour[2], player.colour[3], 0)
+		})
+		self.players[player.number] = {
+			gamepad_id == gamepad_id,
+			colour = player.colour,
+			id = id
+		}
+	end
+end
 
 function init(self)
 	msg.post(".", "acquire_input_focus")
 
-	self.players = {} -- A table of players
-
-	msg.post("#map-proxy","load")
-
+	self.players = {} -- A list of players indexed by number always without gaps
 end
+
 function on_message(self, message_id, message, sender)
 	if message_id == hash("init_parameters") then
 		-- Players is in the form
@@ -18,16 +42,12 @@ function on_message(self, message_id, message, sender)
 		--    label = <invalid>
 		-- 	}
 		-- }
-		print("Recived Parameters")
-		for gamepad_id, player in pairs(message.players) do
-			print("- - - -")
-			print("id = "..gamepad_id)
-			print("number = "..player.number)
-			print("colour = "..table.concat(player.colour, ","))
-		end
+		start_players(self, message)
+		msg.post("#map-proxy","load")
 	elseif message_id == hash("proxy_loaded") then
 		msg.post(sender, "init")
 		msg.post(sender, "enable")
-		msg.post("map:/controller", "load_map", {mapname = "map1"})
+		load_map("map1")
+		spawn_players(self)
 	end
 end

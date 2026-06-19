@@ -1,0 +1,24 @@
+-- This script is resposible for creating characters
+-- It is spawned in the gameplay script and lives for the whole game
+-- It communicates with the map collection for creating characters
+function init(self)
+	-- Defined elsewhere
+	-- self.number
+	-- self.gamepad_id
+	-- self.colour
+	
+	self.character = {
+		
+	}
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("spawn_character") then
+		print("SPAWNING CHARACTER")
+		print(message.mapURL)
+		msg.post(message.mapURL, "spawn_character", {number = self.number, character = self.character})
+		msg.post(message.mapURL, "force_property", {number = self.number, property = "tint", value = self.colour})
+	elseif message_id == hash("destroy_character") then
+		msg.post(message.mapURL, "destroy_character", {number = self.number})
+	end
+end

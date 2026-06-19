@@ -13,6 +13,12 @@ embedded_instances {
   "dynamic_prototype: true\\n"
   "\"\n"
   "}\n"
+  "embedded_components {\n"
+  "  id: \"character-factory\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/main/gameplay/player/character.collection\\\"\\n"
+  "\"\n"
+  "}\n"
   ""
 }
 embedded_instances {
