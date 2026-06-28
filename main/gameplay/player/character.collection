@@ -4,7 +4,11 @@ embedded_instances {
   id: "character"
   children: "body"
   children: "weapon"
-  data: ""
+  data: "components {\n"
+  "  id: \"character\"\n"
+  "  component: \"/main/gameplay/player/character.script\"\n"
+  "}\n"
+  ""
 }
 embedded_instances {
   id: "weapon"

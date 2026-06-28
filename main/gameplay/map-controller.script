@@ -39,7 +39,14 @@ function on_message(self, message_id, message, sender)
 	if message_id == hash("load_map") then
 		load_map(message.mapname)
 	elseif message_id == hash("spawn_character") then
-		self.players[message.number] = collectionfactory.create("#character-factory",vmath.vector3(100, 100, 0), vmath.quat(), message.character, vmath.vector3(0.25,0.25,0.25))
+		self.players[message.number] = collectionfactory.create("#character-factory",vmath.vector3(100, 100, 0), vmath.quat(), {}, 0.25)
+		for object, properties in pairs(message.properties) do
+			for fragment, values in pairs(properties) do
+				for property, value in pairs(values) do
+					go.set(msg.url("map", self.players[message.number][object], fragment), property, value)
+				end
+			end
+		end	
 	elseif message_id == hash("force_property") then
 		go.set(self.players[message.number], message.property, message.value)
 	end

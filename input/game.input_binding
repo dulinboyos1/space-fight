@@ -30,3 +30,11 @@ gamepad_trigger {
   input: GAMEPAD_RPAD_RIGHT
   action: "B"
 }
+gamepad_trigger {
+  input: GAMEPAD_LSTICK_LEFT
+  action: "Lstick_left"
+}
+gamepad_trigger {
+  input: GAMEPAD_LSTICK_RIGHT
+  action: "Lstick_right"
+}

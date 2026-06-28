@@ -12,11 +12,10 @@ end
 
 local function start_players(self, message)
 	for gamepad_id, player in pairs(message.players) do
-		
 		local id = factory.create("#player-factory", vmath.vector3(), vmath.quat(), {
 			number = player.number,
 			gamepad_id = gamepad_id,
-			colour = vmath.vector4(player.colour[1], player.colour[2], player.colour[3], 0)
+			colour = vmath.vector4(player.colour[1], player.colour[2], player.colour[3], 1)
 		})
 		self.players[player.number] = {
 			gamepad_id == gamepad_id,
