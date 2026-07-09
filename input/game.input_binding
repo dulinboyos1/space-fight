@@ -14,6 +14,10 @@ key_trigger {
   input: KEY_ESC
   action: "B"
 }
+key_trigger {
+  input: KEY_F1
+  action: "open_debug"
+}
 gamepad_trigger {
   input: GAMEPAD_LSTICK_UP
   action: "Lstick_up"

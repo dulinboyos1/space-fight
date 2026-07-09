@@ -2,7 +2,7 @@
 -- It is spawned in the gameplay script and lives for the whole game
 -- It communicates with the map collection for creating characters
 go.property("number", 0)
-go.property("gameplay_id", 0)
+go.property("gamepad_id", 0)
 go.property("colour", vmath.vector4())
 
 function init(self)
@@ -10,11 +10,14 @@ function init(self)
 	-- self.number
 	-- self.gamepad_id
 	-- self.colour
+
+	print("id =")
+	print(self.gamepad_id)
 	
 	self.characterProperties = {}
 	self.characterProperties[hash("/body")] = {["sprite"] = {tint = self.colour}}
 	self.characterProperties[hash("/weapon")] = {["sprite"] = {tint = self.colour}}
-	self.characterProperties[hash("/character")] = {["character"] = {gamepad = self.gamepad}}
+	self.characterProperties[hash("/character")] = {["character"] = {gamepad = self.gamepad_id}}
 end
 
 function on_message(self, message_id, message, sender)

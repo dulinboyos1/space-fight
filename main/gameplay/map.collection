@@ -1,4 +1,12 @@
 name: "map"
+collection_instances {
+  id: "debug"
+  collection: "/main/gameplay/debug.collection"
+  position {
+    y: 1750.0
+    z: 0.1
+  }
+}
 scale_along_z: 0
 embedded_instances {
   id: "controller"
