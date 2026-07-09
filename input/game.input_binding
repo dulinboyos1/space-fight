@@ -38,3 +38,7 @@ gamepad_trigger {
   input: GAMEPAD_LSTICK_RIGHT
   action: "Lstick_right"
 }
+gamepad_trigger {
+  input: GAMEPAD_LPAD_UP
+  action: "Dpad_up"
+}

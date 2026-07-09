@@ -23,7 +23,7 @@ end
 
 local function load_map(name)
 	collectionfactory.set_prototype("#map-factory", "/main/gameplay/maps/"..name..".collectionc")
-	collectionfactory.create("#map-factory")
+	return collectionfactory.create("#map-factory")
 end
 
 function init(self)
@@ -37,9 +37,9 @@ end
 function on_message(self, message_id, message, sender)
 	print("map message recived")
 	if message_id == hash("load_map") then
-		load_map(message.mapname)
+		self.map = load_map(message.mapname)
 	elseif message_id == hash("spawn_character") then
-		self.players[message.number] = collectionfactory.create("#character-factory",vmath.vector3(100, 100, 0), vmath.quat(), {}, 0.25)
+		self.players[message.number] = collectionfactory.create("#character-factory",go.get_position(self.map[hash("/spawn "..message.number)]), go.get_rotation(self.map[hash("/spawn "..message.number)]), {}, 0.25)
 		for object, properties in pairs(message.properties) do
 			for fragment, values in pairs(properties) do
 				for property, value in pairs(values) do
