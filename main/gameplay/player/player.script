@@ -10,7 +10,6 @@ function init(self)
 	-- self.number
 	-- self.gamepad_id
 	-- self.colour
-	print("Player gamepad_id = "..self.gamepad_id)
 	
 	self.characterProperties = {}
 	self.characterProperties[hash("/body")] = {["sprite"] = {tint = self.colour}}

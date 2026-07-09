@@ -4,9 +4,40 @@ local TimerLabel = "/countdown#countdown-label"
 local Countdown = "/countdown"
 local BlankTint = vmath.vector4(1, 1, 1, 0.4)
 
+local Debug = "/debug"
+local DebugTint = vmath.vector4(1, 1, 1, 0.5) 
+
+local function debug_menu_prep(self)
+	go.set(Debug.."/menu#background", "tint", DebugTint)
+	msg.post(Debug.."/menu", "disable")
+end
+
+local function debug_menu_show(self)
+	msg.post(Debug.."/menu", "enable")
+	self.debug.enabled = true
+end
+
+local function debug_menu_hide(self, name)
+	msg.post(Debug.."/menu", "disable")
+	self.debug.enabled = false
+end
+
+local function debug_menu_update(self)
+	if self.debug.enabled then
+		for menu_name, menu_data in pairs(self.debug.data) do
+			local data = menu_name.."\n"
+			for name, value in pairs(menu_data) do
+				data = data..name..": "..value.."\n"
+			end
+			label.set_text(Debug.."/menu#"..menu_name, data)
+		end
+	end
+end
+	
 local function next_second(self, handle, elapsed_time)
 	if self.currentSecond <= 1 then
 		msg.post(Countdown, "disable") -- If time is 0 disable the countdown
+		timer.cancel(handle)
 	else
 		self.currentSecond = self.currentSecond - 1
 		label.set_text(TimerLabel, tostring(self.currentSecond))
@@ -31,11 +62,32 @@ function init(self)
 
 	self.players = {} -- A table of players
 
+	self.debug = {  -- Debug data
+		enabled = false,
+		data = {physics = {
+			
+		}}
+	}
+	
+	debug_menu_prep()
+	
 	start_countdown(self)
 end
 
+function on_input(self, action_id, action)
+	if not action.pressed then
+		return
+	end
+	if action_id == hash("open_debug") then
+		if self.debug.enabled then
+			debug_menu_hide(self)
+		else
+			debug_menu_show(self)
+		end
+	end
+end
+
 function on_message(self, message_id, message, sender)
-	print("map message recived")
 	if message_id == hash("load_map") then
 		self.map = load_map(message.mapname)
 	elseif message_id == hash("spawn_character") then
@@ -49,5 +101,8 @@ function on_message(self, message_id, message, sender)
 		end	
 	elseif message_id == hash("force_property") then
 		go.set(self.players[message.number], message.property, message.value)
+	elseif message_id == hash("debug_data") then
+		self.debug.data.physics = message.data
+		debug_menu_update(self)
 	end
 end
