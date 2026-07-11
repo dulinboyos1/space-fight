@@ -19,6 +19,3 @@ scale_mode = stretch
 [project]
 title = Space Fight
 
-[engine]
-fixed_update_frequency = 120
-

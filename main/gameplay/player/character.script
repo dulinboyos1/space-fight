@@ -1,4 +1,7 @@
 go.property("gamepad_id", -1)
+go.property("locked", true)
+
+local damageTime = 0.1
 
 local function sign(x)
 	-- returns the sign of a value x > 0: 1, x = 0: 0, x < 0: -1
@@ -21,6 +24,8 @@ end
 function init(self)
 	msg.post(".", "acquire_input_focus")
 
+	go.set("#damageCircle", "tint", vmath.vector4(0,0,0,0))
+	
 	self.velocity = vmath.vector3()
 	self.position = go.get_position()
 	self.rotation = go.get_rotation()
@@ -46,15 +51,34 @@ function init(self)
 		vertical = 0,
 
 		horizontal2 = 0,
-		vertical2 = 0
+		vertical2 = 0,
+
+		rTrigger = false,
 	}
 
-	print(msg.url())
 	self.weapon = {
 		rotation = vmath.quat(),
-		id = "weapon"
+		id = "weapon",
+		fireTime = 0.5,
+		ready = true,
 	}
 
+	self.bullet = {
+		init = {
+			"setVelocity",
+			"setOffset"
+		},
+		onTick = {
+			"move"
+		},
+		onImpact = {
+			"damageIfPlayer",
+			"destroy"
+		},
+		speed = 1000,
+		tint = vmath.vector4(1, 0.1, 0.1, 1),
+		offset = 50
+	}
 
 
 	calculateDragCoefficients(self)
@@ -62,18 +86,26 @@ function init(self)
 end
 
 local function move(self, dir, force)
-	self.velocity = self.velocity + dir * force
+	if not self.locked then
+		self.velocity = self.velocity + dir * force
+	end
 	local angle = math.atan2(-dir.x, dir.y)
 	self.rotation = vmath.quat_rotation_z(angle)
+end
+
+local function resetWeapon(self, handle, time_elasped)
+	self.weapon.ready = true;
+end
+
+local function resetDamageCircle(self, handle, time_elapsed)
+	go.set("#damageCircle", "tint", vmath.vector4(0,0,0,0))
+	
 end
 
 function fixed_update(self, dt)
 	if self.input.horizontal ~= 0 or self.input.vertical ~= 0 then
 		self.direction = vmath.normalize(vmath.vector3(self.input.horizontal, self.input.vertical, 0))
 		move(self, self.direction, self.kinematics.acceleration * dt)
-	-- elseif self.input.horizontal ~= 0 or self.input.vertical ~= 0 then
-	-- 	self.direction = vmath.vector3(self.input.horizontal, self.input.vertical, 0)
-	-- 	move(self, self.direction, self.kinematics.acceleration * dt)
 	end
 
 	-- Set position and rotation
@@ -86,12 +118,11 @@ function fixed_update(self, dt)
 	-- Weapon rotation
 	-- The weapon should be rotated such that it faces in the direction of the secondary axis
 	-- independent of the state of the main body, it must cancel out main body rotation
-	pprint(self.input)
 	if self.input.horizontal2 ~= 0 or self.input.vertical2 ~= 0 then
 		local direction2 = vmath.normalize(vmath.vector3(self.input.horizontal2, self.input.vertical2, 0))
 		local angle = math.atan2(-direction2.x, direction2.y)
-		self.weapon.rotation = vmath.conj(self.rotation) * vmath.quat_rotation_z(angle)
-		go.set_rotation(self.weapon.rotation, self.weapon.id)
+		self.weapon.rotation = vmath.quat_rotation_z(angle)
+		go.set_rotation(vmath.conj(self.rotation) * self.weapon.rotation, self.weapon.id)
 	else
 		self.weapon.rotation = go.get_world_rotation(self.weapon.id)
 	end
@@ -139,6 +170,13 @@ function fixed_update(self, dt)
 
 	self.velocity = self.velocity + (dt * drag)
 
+
+	-- Weapon
+	if self.weapon.ready and self.input.rTrigger and not self.locked then
+		msg.post("/controller", "fire_bullet", {position = self.position, rotation = self.weapon.rotation, properties = self.bullet})
+		self.weapon.ready = false
+		timer.delay(self.weapon.fireTime, false, resetWeapon)
+	end
 	
 	
 	-- Gather debug
@@ -185,8 +223,12 @@ function on_input(self, action_id, action)
 
 		-- Triggers
 
-	elseif action_id == hash("gamepad_right_trigger") then
+	elseif action_id == hash("Rtrigger") then
 		self.input.rTrigger = action.value > 0.9
+
+
+		-- D pad
+	
 	elseif action_id == hash("Dpad_up") then
 		go.delete(".", true)
 	end
@@ -198,5 +240,8 @@ function on_message(self, message_id, message, sender)
 		local newpos = go.get_position() + message.normal * message.distance
 		self.velocity = (self.velocity - 2 * message.normal * vmath.dot(self.velocity,message.normal)) * self.kinematics.bounce_coefficient
 		go.set_position(newpos)
+	elseif message_id == hash("damage") then
+		go.set("#damageCircle", "tint", vmath.vector4(0.95,0.95,0.95,1))
+		timer.delay(damageTime, false, resetDamageCircle)
 	end
 end
