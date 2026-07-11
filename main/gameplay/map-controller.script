@@ -84,7 +84,7 @@ local updateCallbacks = {
 local impactCallbacks = {
 	damageIfPlayer = function(id, bullet, bullets, event, other_event, type)
 		print(type)
-		if type == hash("player") then
+		if type == hash("player_damage") then
 			msg.post(other_event.id, "damage", {damage = bullet.damage})
 		end
 	end,

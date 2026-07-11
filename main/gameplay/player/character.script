@@ -59,7 +59,8 @@ function init(self)
 	self.weapon = {
 		rotation = vmath.quat(),
 		id = "weapon",
-		fireTime = 0.5,
+		fireTime = 0.3,
+		repeating = true,
 		ready = true,
 	}
 
@@ -76,8 +77,8 @@ function init(self)
 			"destroy"
 		},
 		speed = 1000,
-		tint = vmath.vector4(1, 0.1, 0.1, 1),
-		offset = 50
+		tint = vmath.vector4(1, 0.5, 0, 1),
+		offset = 180 * go.get_scale().x
 	}
 
 
