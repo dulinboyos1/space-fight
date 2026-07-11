@@ -31,10 +31,10 @@ function init(self)
 
 		acceleration = 1000,
 		drag = {
-			lateral_drag_constant = 0.01, -- Adjusts the smoothness of the exponetial drag growth (-1: decays up to TV, 0: UNDEFINED, 1: grows up to TV very very very quickly )
-			longtitudinal_drag_constant = 0.01,
-			lateral_terminal_velocity = 300,
-			longtitudinal_terminal_velocity = 500,
+			lateral_drag_constant = 0.0001, -- Adjusts the smoothness of the exponetial drag growth (-1: decays up to TV, 0: UNDEFINED, 1: grows up to TV very very very quickly )
+			longtitudinal_drag_constant = 0.0001,
+			lateral_terminal_velocity = 600,
+			longtitudinal_terminal_velocity = 1000,
 			drag_cap = 100000,
 		},
 		bounce_coefficient = 0.3
@@ -43,8 +43,19 @@ function init(self)
 
 	self.input = {
 		horizontal = 0,
-		vertical = 0
+		vertical = 0,
+
+		horizontal2 = 0,
+		vertical2 = 0
 	}
+
+	print(msg.url())
+	self.weapon = {
+		rotation = vmath.quat(),
+		id = "weapon"
+	}
+
+
 
 	calculateDragCoefficients(self)
 	
@@ -57,12 +68,12 @@ local function move(self, dir, force)
 end
 
 function fixed_update(self, dt)
-	if self.input.horizontal ~= 0 and self.input.vertical ~= 0 then
+	if self.input.horizontal ~= 0 or self.input.vertical ~= 0 then
 		self.direction = vmath.normalize(vmath.vector3(self.input.horizontal, self.input.vertical, 0))
 		move(self, self.direction, self.kinematics.acceleration * dt)
-	elseif self.input.horizontal ~= 0 or self.input.vertical ~= 0 then
-		self.direction = vmath.vector3(self.input.horizontal, self.input.vertical, 0)
-		move(self, self.direction, self.kinematics.acceleration * dt)
+	-- elseif self.input.horizontal ~= 0 or self.input.vertical ~= 0 then
+	-- 	self.direction = vmath.vector3(self.input.horizontal, self.input.vertical, 0)
+	-- 	move(self, self.direction, self.kinematics.acceleration * dt)
 	end
 
 	-- Set position and rotation
@@ -71,6 +82,19 @@ function fixed_update(self, dt)
 	go.set_position(self.position)
 	go.set_rotation(self.rotation)
 
+
+	-- Weapon rotation
+	-- The weapon should be rotated such that it faces in the direction of the secondary axis
+	-- independent of the state of the main body, it must cancel out main body rotation
+	pprint(self.input)
+	if self.input.horizontal2 ~= 0 or self.input.vertical2 ~= 0 then
+		local direction2 = vmath.normalize(vmath.vector3(self.input.horizontal2, self.input.vertical2, 0))
+		local angle = math.atan2(-direction2.x, direction2.y)
+		self.weapon.rotation = vmath.conj(self.rotation) * vmath.quat_rotation_z(angle)
+		go.set_rotation(self.weapon.rotation, self.weapon.id)
+	else
+		self.weapon.rotation = go.get_world_rotation(self.weapon.id)
+	end
 	
 	-- Hard boundry protection
 	-- Send a collision event facing backtowards the map with distance equal to the distance outside the map
@@ -128,9 +152,6 @@ function on_input(self, action_id, action)
 	if action.gamepad ~= self.gamepad_id or self.gamepad_id == nil then
 		return
 	end
-	print("input recived")
-	print(action_id)
-	pprint(action)
 	if action_id == hash("Lstick_up") then
 		self.input.vertical = action.value
 
@@ -145,16 +166,16 @@ function on_input(self, action_id, action)
 
 		-- Second stick / second axis
 
-	elseif action_id == hash("gamepad_up_2") then
+	elseif action_id == hash("Rstick_up") then
 		self.input.vertical2 = action.value
 
-	elseif action_id == hash("gamepad_down_2") then
+	elseif action_id == hash("Rstick_down") then
 		self.input.vertical2 = -action.value
 
-	elseif action_id == hash("gamepad_left_2") then
+	elseif action_id == hash("Rstick_left") then
 		self.input.horizontal2 = -action.value
 
-	elseif action_id == hash("gamepad_right_2") then
+	elseif action_id == hash("Rstick_right") then
 		self.input.horizontal2 = action.value
 
 		-- Buttons

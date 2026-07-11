@@ -7,6 +7,8 @@ local BlankTint = vmath.vector4(1, 1, 1, 0.4)
 local Debug = "/debug"
 local DebugTint = vmath.vector4(1, 1, 1, 0.5) 
 
+local characterScale = 0.3
+
 local function debug_menu_prep(self)
 	go.set(Debug.."/menu#background", "tint", DebugTint)
 	msg.post(Debug.."/menu", "disable")
@@ -91,7 +93,7 @@ function on_message(self, message_id, message, sender)
 	if message_id == hash("load_map") then
 		self.map = load_map(message.mapname)
 	elseif message_id == hash("spawn_character") then
-		self.players[message.number] = collectionfactory.create("#character-factory",go.get_position(self.map[hash("/spawn "..message.number)]), go.get_rotation(self.map[hash("/spawn "..message.number)]), {}, 0.25)
+		self.players[message.number] = collectionfactory.create("#character-factory",go.get_position(self.map[hash("/spawn "..message.number)]), go.get_rotation(self.map[hash("/spawn "..message.number)]), {}, characterScale)
 		for object, properties in pairs(message.properties) do
 			for fragment, values in pairs(properties) do
 				for property, value in pairs(values) do
