@@ -14,12 +14,13 @@ embedded_components {
   scale {
     x: 0.2
     y: 0.2
+    z: -0.3
   }
 }
 embedded_components {
   id: "collisionobject"
   type: "collisionobject"
-  data: "type: COLLISION_OBJECT_TYPE_TRIGGER\n"
+  data: "type: COLLISION_OBJECT_TYPE_KINEMATIC\n"
   "mass: 0.0\n"
   "friction: 0.1\n"
   "restitution: 0.5\n"

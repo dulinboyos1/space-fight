@@ -18,4 +18,5 @@ scale_mode = stretch
 
 [project]
 title = Space Fight
+custom_resources = main/gameplay/maps
 

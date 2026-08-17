@@ -11,6 +11,12 @@ local characterScale = 0.4
 
 local bulletFactory = "#bullet-factory"
 
+local mapReady = false
+local mapContent = {}
+
+local playersReady = false
+local loadingDone = false
+
 local function debug_menu_prep(self)
 	go.set(Debug.."/menu#background", "tint", DebugTint)
 	msg.post(Debug.."/menu", "disable")
@@ -52,16 +58,23 @@ local function next_second(self, handle, elapsed_time)
 end
 
 local function start_countdown(self)
-	self.currentSecond = 3
-	msg.post(Countdown, "enable")
-	go.set(Countdown.."#sprite", "tint", BlankTint)
 	label.set_text(TimerLabel, tostring(self.currentSecond))
 	timer.delay(1, true, next_second)
 end
 
+local function prep_countdown(self)
+	self.currentSecond = 3
+	msg.post(Countdown, "enable")
+	go.set(Countdown.."#sprite", "tint", BlankTint)
+end
+
 local function load_map(name)
-	collectionfactory.set_prototype("#map-factory", "/main/gameplay/maps/"..name..".collectionc")
-	return collectionfactory.create("#map-factory")
+	collectionfactory.load("#"..name.."-factory", function(self, url, result)
+		if result then
+			mapContent = collectionfactory.create(url)
+			mapReady = true
+		end
+	end)
 end
 
 -- Bullet callbacks -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -82,15 +95,23 @@ local updateCallbacks = {
 }
 
 local impactCallbacks = {
+	moveToEdge = function(id, bullet, bullets, event, other_event, type)
+		bullet.position = bullet.position + event.normal * event.distance
+	end,
 	damageIfPlayer = function(id, bullet, bullets, event, other_event, type)
-		print(type)
-		if type == hash("player_damage") then
+		if type == hash("player_damage") and not go.get(msg.url(nil, other_event.id, "character"), "shieldExport") then
 			msg.post(other_event.id, "damage", {damage = bullet.damage})
+		elseif type == hash("player_damage") then
+			bullet.velocity = -bullet.velocity
+			bullet.doNotDestroy = true
 		end
 	end,
 	destroy = function(id, bullet, bullets, event, other_event, type)
-		bullets[id] = nil
-		go.delete(id, false)
+		if not bullet.doNotDestroy then
+			bullets[id] = nil
+			go.delete(id, false)
+		end
+		bullet.doNotDestroy = false
 	end
 }
 
@@ -126,51 +147,67 @@ local function update_bullet(id, bullet, bullets, dt)
 
 	-- Hard boundary protection
 	if bullet.position.x > 2900 then -- If outside on the right
-		impact_bullet(id, bullet, bullets, {}, {}, "border")
+		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(-1, 0, 0), distance = 2900 - bullet.position.x}, {}, "border")
 	elseif bullet.position.x < 0 then -- If outside on the left
-		impact_bullet(id, bullet, bullets, {}, {}, "border")
+		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(1, 0, 0), distance = -bullet.position.x}, {}, "border")
 	elseif bullet.position.y > 1700 then -- If outside at the top
-		impact_bullet(id, bullet, bullets, {}, {}, "border")
+		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(0, -1, 0), distance = 1700 - bullet.position.y}, {}, "border")
 	elseif bullet.position.y < 0 then -- If outside at the bottom
-		impact_bullet(id, bullet, bullets, {}, {}, "border")
+		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(0, 1, 0), distance = -bullet.position.y}, {}, "border")
 	end
 end
 
 local function physics_listener(self, events)
 	for _, event in ipairs(events) do
 		if event.type == hash("trigger_event") then
+		elseif event.type == hash("contact_point_event") then
 			if self.bullets[event.a.id] then
 				local type = event.b.group
+
+				event.a.distance = event.distance
 				
 				impact_bullet(event.a.id, self.bullets[event.a.id], self.bullets, event.a, event.b, type)
 			elseif self.bullets[event.b.id] then
 				local type = event.a.group
+
+				event.b.distance = event.distance
 				
 				impact_bullet(event.b.id, self.bullets[event.b.id], self.bullets, event.b, event.a, type)
+			else
+				-- Forward the message to the colliding objects (which are not bullets)
+				local function send_side(self_side, other_side)
+					msg.post(msg.url(nil, self_side.id, nil), "contact_point_response", {
+						position = self_side.position,
+						normal = self_side.normal,
+						relative_velocity = self_side.relative_velocity,
+						distance = event.distance,
+						applied_impulse = event.applied_impulse,
+						mass = self_side.mass,
+						other_mass = other_side.mass,
+						other_id = other_side.id,
+						other_position = other_side.position,
+						group = self_side.group,
+						other_group = other_side.group,
+						life_time = 1,
+						own_group = self_side.group
+					})
+				end
+				send_side(event.a, event.b)
+				send_side(event.b, event.a)
 			end
-		elseif event.type == hash("contact_point_event") then
-			-- Forward the message to the colliding objects
-			local function send_side(self_side, other_side)
-				msg.post(msg.url(nil, self_side.id, nil), "contact_point_response", {
-					position = self_side.position,
-					normal = self_side.normal,
-					relative_velocity = self_side.relative_velocity,
-					distance = event.distance,
-					applied_impulse = event.applied_impulse,
-					mass = self_side.mass,
-					other_mass = other_side.mass,
-					other_id = other_side.id,
-					other_position = other_side.position,
-					group = self_side.group,
-					other_group = other_side.group,
-					life_time = 1,
-					own_group = self_side.group
-				})
-			end
-			send_side(event.a, event.b)
-			send_side(event.b, event.a)
 		end
 	end
+end
+
+local function spawn_character(self, message)
+	self.players[message.number] = collectionfactory.create("#character-factory",go.get_position(mapContent[hash("/spawn "..message.number)]), go.get_rotation(mapContent[hash("/spawn "..message.number)]), {}, characterScale)
+	for object, properties in pairs(message.properties) do
+		for fragment, values in pairs(properties) do
+			for property, value in pairs(values) do
+				go.set(msg.url("map", self.players[message.number][object], fragment), property, value)
+			end
+		end
+	end	
 end
 
 function init(self)
@@ -190,13 +227,20 @@ function init(self)
 	self.bullets = {} -- A list of bullets
 	
 	debug_menu_prep()
-	
-	start_countdown(self)
+	prep_countdown(self)
 end
 
 function fixed_update(self, dt)
 	for id, bullet in pairs(self.bullets) do
 		update_bullet(id, bullet, self.bullets, dt)
+	end
+
+	if mapReady and playersReady and not loadingDone then
+		for i,v in pairs(self.players) do
+			spawn_character(self, v)
+		end
+		loadingDone = true
+		start_countdown(self)
 	end
 end
 
@@ -215,16 +259,13 @@ end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("load_map") then
-		self.map = load_map(message.mapname)
+		load_map(message.mapname)
 	elseif message_id == hash("spawn_character") then
-		self.players[message.number] = collectionfactory.create("#character-factory",go.get_position(self.map[hash("/spawn "..message.number)]), go.get_rotation(self.map[hash("/spawn "..message.number)]), {}, characterScale)
-		for object, properties in pairs(message.properties) do
-			for fragment, values in pairs(properties) do
-				for property, value in pairs(values) do
-					go.set(msg.url("map", self.players[message.number][object], fragment), property, value)
-				end
-			end
-		end	
+		-- Add character to player list and update ready flag
+		self.players[message.number] = message 
+		if #self.players == self.playerCount then
+			playersReady = true
+		end
 	elseif message_id == hash("force_property") then
 		go.set(self.players[message.number], message.property, message.value)
 	elseif message_id == hash("debug_data") then
@@ -239,5 +280,7 @@ function on_message(self, message_id, message, sender)
 		self.bullets[bulletId] = message.properties
 
 		init_bullet(bulletId, bullet)
+	elseif message_id == hash("player_count") then
+		self.playerCount = message.count
 	end
 end

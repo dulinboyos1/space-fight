@@ -1,6 +1,7 @@
 go.property("gamepad_id", -1)
 go.property("locked", true)
 go.property("tint", vmath.vector4(1, 1, 1, 1))
+go.property("shieldExport", false)
 
 local damageTime = 0.1
 
@@ -93,6 +94,7 @@ function init(self)
 			"move"
 		},
 		onImpact = {
+			"moveToEdge",
 			"damageIfPlayer",
 			"destroy"
 		},
@@ -158,6 +160,7 @@ end
 
 local function resetShield(self, handle, time_elapsed)
 	go.set("#shield", "scale", self.shield.minsize)
+	self.shieldExport = false
 	self.shield.status = false
 	self.shield.cooldown = true
 	self.shield.currentFrame = 1
@@ -191,6 +194,7 @@ function fixed_update(self, dt)
 	-- Shield
 	if not self.shield.status and self.input.lTrigger and not self.shield.cooldown then
 		self.shield.status = true
+		self.shieldExport = true
 		msg.post("#shield","enable")
 		go.animate("#shield", "scale", go.PLAYBACK_ONCE_FORWARD, self.shield.fullsize, go.EASING_LINEAR, self.shield.animTime, 0, nil)
 		timer.delay(self.shield.time, false, resetShield)

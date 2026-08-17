@@ -1,3 +1,11 @@
+local maps = {
+	"map1",
+	"map2"
+}
+
+
+
+
 local function load_map(map_name)
 	msg.post("map:/controller", "load_map", {mapname = map_name})
 end
@@ -46,7 +54,8 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == hash("proxy_loaded") then
 		msg.post(sender, "init")
 		msg.post(sender, "enable")
-		load_map("map1")
+		load_map(maps[math.random(#maps)])
+		msg.post("map:/controller", "player_count", {count = #self.players})
 		spawn_players(self)
 	end
 end
