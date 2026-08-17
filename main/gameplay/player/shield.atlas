@@ -1,0 +1,64 @@
+animations {
+  id: "1"
+  images {
+    image: "/assets/player/Shield1.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "2"
+  images {
+    image: "/assets/player/Shield2.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "3"
+  images {
+    image: "/assets/player/Shield3.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "4"
+  images {
+    image: "/assets/player/Shield4.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "5"
+  images {
+    image: "/assets/player/Shield5.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "6"
+  images {
+    image: "/assets/player/Shield6.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "7"
+  images {
+    image: "/assets/player/Shield7.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "8"
+  images {
+    image: "/assets/player/Shield8.png"
+  }
+  playback: PLAYBACK_NONE
+}
+animations {
+  id: "9"
+  images {
+    image: "/assets/player/Shield9.png"
+  }
+  playback: PLAYBACK_NONE
+}
+extrude_borders: 2
