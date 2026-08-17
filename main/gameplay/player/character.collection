@@ -3,6 +3,8 @@ scale_along_z: 0
 embedded_instances {
   id: "character"
   children: "body"
+  children: "boostBar"
+  children: "trail"
   children: "weapon"
   data: "components {\n"
   "  id: \"character\"\n"
@@ -90,6 +92,29 @@ embedded_instances {
   "}\\n"
   "\"\n"
   "}\n"
+  "embedded_components {\n"
+  "  id: \"shield\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"9\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "size {\\n"
+  "  x: 889.0\\n"
+  "  y: 889.0\\n"
+  "}\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/gameplay/player/shield.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "  position {\n"
+  "    z: 0.02\n"
+  "  }\n"
+  "  scale {\n"
+  "    x: 0.176356\n"
+  "    y: 0.176356\n"
+  "    z: 0.176356\n"
+  "  }\n"
+  "}\n"
   ""
 }
 embedded_instances {
@@ -134,6 +159,54 @@ embedded_instances {
   "  sampler: \\\"texture_sampler\\\"\\n"
   "  texture: \\\"/main/gameplay/player/character.atlas\\\"\\n"
   "}\\n"
+  "\"\n"
+  "}\n"
+  ""
+}
+embedded_instances {
+  id: "boostBar"
+  data: "embedded_components {\n"
+  "  id: \"sprite\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"Purple Square\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "slice9 {\\n"
+  "  x: 5.0\\n"
+  "  y: 5.0\\n"
+  "  z: 5.0\\n"
+  "  w: 5.0\\n"
+  "}\\n"
+  "size {\\n"
+  "  x: 300.0\\n"
+  "  y: 300.0\\n"
+  "}\\n"
+  "size_mode: SIZE_MODE_MANUAL\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/common.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "}\n"
+  ""
+  position {
+    y: -77.0
+    z: 0.01
+  }
+  rotation {
+    z: 0.70710677
+    w: 0.70710677
+  }
+  scale3 {
+    x: 0.3
+    y: 0.12
+  }
+}
+embedded_instances {
+  id: "trail"
+  data: "embedded_components {\n"
+  "  id: \"trail-factory\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/main/gameplay/player/trailNode.go\\\"\\n"
   "\"\n"
   "}\n"
   ""

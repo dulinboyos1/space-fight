@@ -8,4 +8,15 @@ images {
 images {
   image: "/assets/Back Indicator.png"
 }
+images {
+  image: "/assets/Green Square.png"
+  pivot_x: 0.0
+}
+images {
+  image: "/assets/Purple Square.png"
+  pivot_x: 0.0
+}
+images {
+  image: "/assets/White Square.png"
+}
 extrude_borders: 2

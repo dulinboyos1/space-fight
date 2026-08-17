@@ -14,7 +14,7 @@ function init(self)
 	self.characterProperties = {}
 	self.characterProperties[hash("/body")] = {["sprite"] = {tint = self.colour}}
 	self.characterProperties[hash("/weapon")] = {["sprite"] = {tint = self.colour}}
-	self.characterProperties[hash("/character")] = {["character"] = {gamepad_id = self.gamepad_id}}
+	self.characterProperties[hash("/character")] = {["character"] = {gamepad_id = self.gamepad_id, tint = self.colour}}
 end
 
 function on_message(self, message_id, message, sender)

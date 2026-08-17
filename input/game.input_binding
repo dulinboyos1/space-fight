@@ -66,3 +66,15 @@ gamepad_trigger {
   input: GAMEPAD_RTRIGGER
   action: "Rtrigger"
 }
+gamepad_trigger {
+  input: GAMEPAD_LTRIGGER
+  action: "Ltrigger"
+}
+gamepad_trigger {
+  input: GAMEPAD_RSHOULDER
+  action: "Rshoulder"
+}
+gamepad_trigger {
+  input: GAMEPAD_LSHOULDER
+  action: "Lshoulder"
+}
