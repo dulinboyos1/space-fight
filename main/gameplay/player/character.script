@@ -79,8 +79,8 @@ function init(self)
 	self.weapon = {
 		rotation = vmath.quat(),
 		id = "weapon",
-		fireTime = 0.3,
-		repeating = true,
+		fireTime = 2,
+		repeating = false,
 		fired = false,
 		ready = true,
 	}
@@ -98,7 +98,7 @@ function init(self)
 			"damageIfPlayer",
 			"destroy"
 		},
-		speed = 3000,
+		speed = 1500,
 		tint = vmath.vector4(1, 0.5, 0, 1),
 		offset = 180 * go.get_scale().x
 	}
@@ -203,7 +203,6 @@ function fixed_update(self, dt)
 			-- Update Display
 			if self.shield.cooldownTime * self.shield.currentFrame / 9 < self.shield.cooldownTimeCurrent then
 				self.shield.currentFrame = self.shield.currentFrame + 1
-				print("Frame: "..self.shield.currentFrame)
 				sprite.play_flipbook("#shield", tostring(self.shield.currentFrame))
 			end
 			self.shield.cooldownTimeCurrent = self.shield.cooldownTimeCurrent + dt
