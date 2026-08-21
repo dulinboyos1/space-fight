@@ -3,11 +3,29 @@ local maps = {
 	"map2"
 }
 
+local winnerScreenTime = 3
 
+local function showWinner(self, winner)
+	go.set("/winnerScreen#winner-label", "color", vmath.vector4(self.players[winner].colour[1], self.players[winner].colour[2], self.players[winner].colour[3], 1))
+	label.set_text("/winnerScreen#winner-label", "PLAYER "..winner.." WINS")
+	msg.post("/winnerScreen", "enable")
+end
 
+local function hideWinner()
+	msg.post("/winnerScreen", "disable")
+end
 
 local function load_map(map_name)
 	msg.post("map:/controller", "load_map", {mapname = map_name})
+end
+
+local function unload_map()
+	msg.post("#map-proxy", "disable")
+	msg.post("#map-proxy", "final")
+	msg.post("#map-proxy", "unload")
+
+	msg.post("#modifiers-proxy", "load")
+	hideWinner()
 end
 
 local function spawn_players(self)
@@ -28,7 +46,8 @@ local function start_players(self, message)
 		self.players[player.number] = {
 			gamepad_id == gamepad_id,
 			colour = player.colour,
-			id = id
+			id = id,
+			score = 0,
 		}
 	end
 end
@@ -36,7 +55,12 @@ end
 function init(self)
 	msg.post(".", "acquire_input_focus")
 
+	msg.post("/winnerScreen","disable")
+	go.set("/winnerScreen#sprite","tint",vmath.vector4(1, 1, 1, 0.6))
+	
 	self.players = {} -- A list of players indexed by number always without gaps
+
+	self.mode = "MAP" -- The current state of the game indicating what to do next MAP/MOD
 end
 
 function on_message(self, message_id, message, sender)
@@ -50,12 +74,28 @@ function on_message(self, message_id, message, sender)
 		-- 	}
 		-- }
 		start_players(self, message)
+		msg.post("/ui#gameplay", "start", self.players)
 		msg.post("#map-proxy","load")
 	elseif message_id == hash("proxy_loaded") then
 		msg.post(sender, "init")
 		msg.post(sender, "enable")
-		load_map(maps[math.random(#maps)])
-		msg.post("map:/controller", "player_count", {count = #self.players})
-		spawn_players(self)
+		
+		if self.mode == "MAP" then
+			load_map(maps[math.random(#maps)])
+			msg.post("map:/controller", "player_count", {count = #self.players})
+			spawn_players(self)
+		end
+	elseif message_id == hash("round_over") then
+		self.mode = "MOD"
+		
+		local winner = message.order[#message.order]
+
+		self.players[winner].score = self.players[winner].score + 1
+		msg.post("/ui#gameplay", "set_score", {number = winner, score = self.players[winner].score})
+		
+		
+		showWinner(self, winner)
+		
+		timer.delay(winnerScreenTime, false, unload_map)
 	end
 end

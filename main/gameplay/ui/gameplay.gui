@@ -1,0 +1,138 @@
+script: "/main/gameplay/ui/gameplay.gui_script"
+textures {
+  name: "ui"
+  texture: "/main/gameplay/ui/ui.atlas"
+}
+nodes {
+  position {
+    x: 2900.0
+  }
+  scale {
+    x: 0.3
+    y: 0.3
+  }
+  type: TYPE_BOX
+  id: "score1"
+  pivot: PIVOT_SE
+  inherit_alpha: true
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: -100.0
+    y: 100.0
+  }
+  scale {
+    x: 0.15
+    y: 0.15
+  }
+  type: TYPE_BOX
+  texture: "ui/White Circle"
+  id: "template1"
+  parent: "score1"
+  alpha: 0.7
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  position {
+    x: 2900.0
+    y: 150.0
+  }
+  scale {
+    x: 0.3
+    y: 0.3
+  }
+  type: TYPE_BOX
+  id: "score4"
+  pivot: PIVOT_SE
+  inherit_alpha: true
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: -100.0
+    y: 100.0
+  }
+  scale {
+    x: 0.15
+    y: 0.15
+  }
+  type: TYPE_BOX
+  texture: "ui/White Circle"
+  id: "template4"
+  parent: "score4"
+  alpha: 0.7
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  position {
+    x: 2900.0
+    y: 50.0
+  }
+  scale {
+    x: 0.3
+    y: 0.3
+  }
+  type: TYPE_BOX
+  id: "score2"
+  pivot: PIVOT_SE
+  inherit_alpha: true
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: -100.0
+    y: 100.0
+  }
+  scale {
+    x: 0.15
+    y: 0.15
+  }
+  type: TYPE_BOX
+  texture: "ui/White Circle"
+  id: "template2"
+  parent: "score2"
+  alpha: 0.7
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  position {
+    x: 2900.0
+    y: 100.0
+  }
+  scale {
+    x: 0.3
+    y: 0.3
+  }
+  type: TYPE_BOX
+  id: "score3"
+  pivot: PIVOT_SE
+  inherit_alpha: true
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: -100.0
+    y: 100.0
+  }
+  scale {
+    x: 0.15
+    y: 0.15
+  }
+  type: TYPE_BOX
+  texture: "ui/White Circle"
+  id: "template3"
+  parent: "score3"
+  alpha: 0.7
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

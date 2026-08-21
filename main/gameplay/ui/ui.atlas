@@ -1,0 +1,10 @@
+images {
+  image: "/assets/Healthbar.png"
+}
+images {
+  image: "/assets/Grey Circle.png"
+}
+images {
+  image: "/assets/White Circle.png"
+}
+extrude_borders: 2

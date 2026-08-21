@@ -1,0 +1,43 @@
+local alpha = 0.8
+local gap = 200
+function init(self)
+	self.scores = {0,0,0,0} -- An ordered list of scores
+	self.circles = {{}, {}, {}, {}} -- A list of circles for each player
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("start") then
+		for i = 1,4 do
+			if message[i] == nil then
+				break
+			end
+			local colour = vmath.vector4(message[i].colour[1],message[i].colour[2],message[i].colour[3], alpha)
+			gui.set_color(gui.get_node("template"..i), colour) -- Set the templates colour
+		end
+	elseif message_id == hash("set_score") then
+		if self.scores[message.number] == message.score then
+			return
+		elseif self.scores[message.number] < message.score then -- Need to add more circles
+			local template = gui.get_node("template"..message.number)
+			for i = 1, message.score - self.scores[message.number] do
+				local newCircle = gui.clone(template)
+				gui.set_id(newCircle, "circle"..message.number.."-"..#self.circles[message.number])
+				local newPosition
+				if #self.circles[message.number] > 0 then -- This is not the first circle
+					newPosition = gui.get_position(self.circles[message.number][#self.circles[message.number]]) - vmath.vector3(gap, 0, 0)
+				else
+					newPosition = gui.get_position(template)
+				end
+				gui.set_position(newCircle, newPosition)
+				gui.set_enabled(newCircle, true)
+				table.insert(self.circles[message.number], newCircle)
+			end
+		elseif self.scores[message.number] > message.score then -- Need to remove cirlces
+			for i = 1, self.scores[message.number] - message.score do
+				local circle = table.remove(self.circles[message.number])
+				gui.delete_node(circle)
+			end
+		end
+		self.scores[message.number] = message.score
+	end
+end

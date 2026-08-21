@@ -1,0 +1,254 @@
+script: "/main/gameplay/ui/map.gui_script"
+textures {
+  name: "ui"
+  texture: "/main/gameplay/ui/ui.atlas"
+}
+nodes {
+  position {
+    y: 1700.0
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  size {
+    x: 522.5
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "healthbar-1"
+  pivot: PIVOT_NW
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  size {
+    x: 527.5
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "clip1"
+  pivot: PIVOT_NW
+  parent: "healthbar-1"
+  clipping_mode: CLIPPING_MODE_STENCIL
+  clipping_visible: false
+  alpha: 0.0
+}
+nodes {
+  scale {
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  }
+  type: TYPE_BOX
+  texture: "ui/Healthbar"
+  id: "fill1-1"
+  pivot: PIVOT_NW
+  parent: "clip1"
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 530.5
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  }
+  type: TYPE_BOX
+  texture: "ui/Healthbar"
+  id: "fill1-2"
+  pivot: PIVOT_NW
+  parent: "clip1"
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: 1610.0
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  size {
+    x: 522.5
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "healthbar-4"
+  pivot: PIVOT_NW
+  inherit_alpha: true
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  size {
+    x: 527.5
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "clip4"
+  pivot: PIVOT_NW
+  parent: "healthbar-4"
+  clipping_mode: CLIPPING_MODE_STENCIL
+  clipping_visible: false
+  alpha: 0.0
+}
+nodes {
+  scale {
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  }
+  type: TYPE_BOX
+  texture: "ui/Healthbar"
+  id: "fill4-1"
+  pivot: PIVOT_NW
+  parent: "clip4"
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 530.5
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  }
+  type: TYPE_BOX
+  texture: "ui/Healthbar"
+  id: "fill4-2"
+  pivot: PIVOT_NW
+  parent: "clip4"
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: 1670.0
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  size {
+    x: 522.5
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "healthbar-2"
+  pivot: PIVOT_NW
+  inherit_alpha: true
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  size {
+    x: 527.5
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "clip2"
+  pivot: PIVOT_NW
+  parent: "healthbar-2"
+  clipping_mode: CLIPPING_MODE_STENCIL
+  clipping_visible: false
+  alpha: 0.0
+}
+nodes {
+  scale {
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  }
+  type: TYPE_BOX
+  texture: "ui/Healthbar"
+  id: "fill2-1"
+  pivot: PIVOT_NW
+  parent: "clip2"
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 530.5
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  }
+  type: TYPE_BOX
+  texture: "ui/Healthbar"
+  id: "fill2-2"
+  pivot: PIVOT_NW
+  parent: "clip2"
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    y: 1640.0
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+  }
+  size {
+    x: 522.5
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "healthbar-3"
+  pivot: PIVOT_NW
+  inherit_alpha: true
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+  enabled: false
+}
+nodes {
+  size {
+    x: 527.5
+    y: 50.0
+  }
+  type: TYPE_BOX
+  id: "clip3"
+  pivot: PIVOT_NW
+  parent: "healthbar-3"
+  clipping_mode: CLIPPING_MODE_STENCIL
+  clipping_visible: false
+  alpha: 0.0
+}
+nodes {
+  scale {
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  }
+  type: TYPE_BOX
+  texture: "ui/Healthbar"
+  id: "fill3-1"
+  pivot: PIVOT_NW
+  parent: "clip3"
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
+  position {
+    x: 530.5
+  }
+  scale {
+    x: 0.5
+    y: 0.5
+    z: 0.5
+  }
+  type: TYPE_BOX
+  texture: "ui/Healthbar"
+  id: "fill3-2"
+  pivot: PIVOT_NW
+  parent: "clip3"
+  size_mode: SIZE_MODE_AUTO
+}
+material: "/builtins/materials/gui.material"
+adjust_reference: ADJUST_REFERENCE_PARENT

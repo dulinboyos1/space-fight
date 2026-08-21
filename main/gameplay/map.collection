@@ -89,5 +89,14 @@ embedded_instances {
   position {
     x: 1450.0
     y: 850.0
+    z: 1.0
   }
+}
+embedded_instances {
+  id: "ui"
+  data: "components {\n"
+  "  id: \"map\"\n"
+  "  component: \"/main/gameplay/ui/map.gui\"\n"
+  "}\n"
+  ""
 }

@@ -1,0 +1,34 @@
+local maxHealth = 100
+
+local sizeX = 527.5
+local sizeY = 50
+local sizeZ = 0
+
+local alpha = 0.5
+
+function init(self)
+	
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("start") then
+		-- Prepare the healthbar
+		for i = 1,4 do
+			if message["player"..i] then
+				local colour = message["player"..i].colour
+				if colour ~= nil then
+					colour.w = alpha
+					gui.set_enabled(gui.get_node("healthbar-"..i), true)
+					gui.set_color(gui.get_node("fill"..i.."-1"), colour)
+					gui.set_color(gui.get_node("fill"..i.."-2"), colour)
+				end
+			end
+		end
+	elseif message_id == hash("setHealth") then
+		-- Set healthbar
+		if message.health < 0 then
+			message.health = 0
+		end
+		gui.set_size(gui.get_node("clip"..message.player), vmath.vector3(sizeX * message.health/maxHealth, sizeY, sizeZ))
+	end
+end

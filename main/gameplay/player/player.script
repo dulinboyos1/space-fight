@@ -5,23 +5,25 @@ go.property("number", -1)
 go.property("gamepad_id", -1)
 go.property("colour", vmath.vector4())
 
+
 function init(self)
 	-- Defined elsewhere
 	-- self.number
 	-- self.gamepad_id
 	-- self.colour
 	
-	self.characterProperties = {}
-	self.characterProperties[hash("/body")] = {["sprite"] = {tint = self.colour}}
-	self.characterProperties[hash("/weapon")] = {["sprite"] = {tint = self.colour}}
-	self.characterProperties[hash("/character")] = {["character"] = {gamepad_id = self.gamepad_id, tint = self.colour}}
+	self.characterProperties = {
+		[hash("/body")] = {["sprite"] = {tint = self.colour}},
+		[hash("/weapon")] = {["sprite"] = {tint = self.colour}},
+		[hash("/character")] = {["character"] = {gamepad_id = self.gamepad_id, tint = self.colour, number = self.number}}
+	}
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("spawn_character") then
 		print("SPAWNING CHARACTER")
 		print(message.mapURL)
-		msg.post(message.mapURL, "spawn_character", {number = self.number, properties = self.characterProperties})
+		msg.post(message.mapURL, "spawn_character", {number = self.number, properties = self.characterProperties, colour = self.colour})
 	elseif message_id == hash("destroy_character") then
 		msg.post(message.mapURL, "destroy_character", {number = self.number})
 	end

@@ -2,7 +2,7 @@
 
 local TimerLabel = "/countdown#countdown-label"
 local Countdown = "/countdown"
-local BlankTint = vmath.vector4(1, 1, 1, 0.4)
+local BlankTint = vmath.vector4(1, 1, 1, 0.6)
 
 local Debug = "/debug"
 local DebugTint = vmath.vector4(1, 1, 1, 0.5) 
@@ -13,7 +13,7 @@ local bulletFactory = "#bullet-factory"
 
 local mapReady = false
 local mapContent = {}
-
+local healthReady = false
 local playersReady = false
 local loadingDone = false
 
@@ -210,6 +210,19 @@ local function spawn_character(self, message)
 	end	
 end
 
+local function healthBarPrep(self)
+	local data = {}
+	for i = 1,4 do
+		if self.players[i] ~= nil then
+			data["player"..i] = {
+				colour = self.players[i].colour
+			}
+		end
+	end
+	msg.post("/ui#map", "start", data)
+	healthReady = true
+end
+
 function init(self)
 	msg.post(".", "acquire_input_focus")
 
@@ -224,8 +237,12 @@ function init(self)
 		}}
 	}
 
-	self.bullets = {} -- A list of bullets
+	self.playerCount = nil -- Set later
 	
+	self.destroyOrder = {} -- An ordered list of when each character died
+	
+	self.bullets = {} -- A list of bullets
+
 	debug_menu_prep()
 	prep_countdown(self)
 end
@@ -235,7 +252,7 @@ function fixed_update(self, dt)
 		update_bullet(id, bullet, self.bullets, dt)
 	end
 
-	if mapReady and playersReady and not loadingDone then
+	if mapReady and playersReady and healthReady and not loadingDone then
 		for i,v in pairs(self.players) do
 			spawn_character(self, v)
 		end
@@ -262,9 +279,11 @@ function on_message(self, message_id, message, sender)
 		load_map(message.mapname)
 	elseif message_id == hash("spawn_character") then
 		-- Add character to player list and update ready flag
-		self.players[message.number] = message 
+		self.players[message.number] = message
 		if #self.players == self.playerCount then
 			playersReady = true
+			-- Prepare health once players are all loaded
+			healthBarPrep(self)
 		end
 	elseif message_id == hash("force_property") then
 		go.set(self.players[message.number], message.property, message.value)
@@ -282,5 +301,15 @@ function on_message(self, message_id, message, sender)
 		init_bullet(bulletId, bullet)
 	elseif message_id == hash("player_count") then
 		self.playerCount = message.count
+	elseif message_id == hash("character_destroyed") then
+		table.insert(self.destroyOrder, message.number)
+		self.players[message.number] = nil -- Remove from player list
+		if #self.destroyOrder >= self.playerCount - 1 then
+			local winner,_ = next(self.players)
+			table.insert(self.destroyOrder, winner) -- Add winner to the end so we know they were last
+			
+			print("All players dead WINNER: PLAYER "..winner)
+			msg.post("gameplay:/controller#gameplay-controller", "round_over", {order = self.destroyOrder})
+		end
 	end
 end
