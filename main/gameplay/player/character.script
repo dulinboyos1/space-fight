@@ -18,6 +18,7 @@ local function sign(x)
 end
 
 local function destroyCharacter(self)
+	msg.post("/ui#map", "setHealth", {player = self.number, health = self.health})
 	msg.post("/controller#map-controller", "character_destroyed", {number = self.number})
 	go.delete(".", true)
 end
@@ -145,8 +146,7 @@ function init(self)
 	
 	self.kinematics.acceleration = self.kinematics.accelerationDefault
 
-	calculateDragCoefficients(self)
-	
+	calculateDragCoefficients(self)		
 end
 
 local function move(self, dir, force)
@@ -362,6 +362,9 @@ function fixed_update(self, dt)
 		direction = string.format("%.1f,%.1f", self.direction.x, self.direction.y),
 		velocity = string.format("%.1f,%.1f", self.velocity.x, self.velocity.y),
 		speed = string.format("%.1f",vmath.length(self.velocity))}})
+
+	-- Health Updates
+	msg.post("/ui#map", "setHealth", {player = self.number, health = self.health})
 end
 
 
