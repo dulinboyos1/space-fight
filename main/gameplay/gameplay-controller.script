@@ -85,8 +85,14 @@ function on_message(self, message_id, message, sender)
 			msg.post("map:/controller", "player_count", {count = #self.players})
 			spawn_players(self)
 		end
+	elseif message_id == hash("proxy_unloaded") then
+		if self.mode == "MAP" then 
+			msg.post("#map-proxy", "load") -- start map again
+		elseif self.mode == "MOD" then
+			msg.post("#modifiers-proxy", "load") -- start modifiers
+		end
 	elseif message_id == hash("round_over") then
-		self.mode = "MOD"
+		--self.mode = "MOD"
 		
 		local winner = message.order[#message.order]
 

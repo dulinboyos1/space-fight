@@ -160,6 +160,17 @@ end
 local function physics_listener(self, events)
 	for _, event in ipairs(events) do
 		if event.type == hash("trigger_event") then
+			-- Forward the message to the colliding objects (which are not bullets)
+			local function send_side(self_side, other_side)
+				msg.post(msg.url(nil, self_side.id, nil), "trigger_response", {
+					enter = event.enter,
+					other_id = other_side.id,
+					other_group = other_side.group,
+					own_group = self_side.group
+				})
+			end
+			send_side(event.a, event.b)
+			send_side(event.b, event.a)
 		elseif event.type == hash("contact_point_event") then
 			if self.bullets[event.a.id] then
 				local type = event.b.group
