@@ -1,27 +1,75 @@
 name: "modifiers"
+instances {
+  id: "menu-navigator"
+  prototype: "/main/menu-navigator/menu-navigator.go"
+}
 scale_along_z: 0
 embedded_instances {
-  id: "go"
+  id: "background"
   data: "embedded_components {\n"
-  "  id: \"label\"\n"
+  "  id: \"background\"\n"
+  "  type: \"sprite\"\n"
+  "  data: \"default_animation: \\\"Background\\\"\\n"
+  "material: \\\"/builtins/materials/sprite.material\\\"\\n"
+  "size {\\n"
+  "  x: 2900.0\\n"
+  "  y: 1700.0\\n"
+  "}\\n"
+  "textures {\\n"
+  "  sampler: \\\"texture_sampler\\\"\\n"
+  "  texture: \\\"/main/common.atlas\\\"\\n"
+  "}\\n"
+  "\"\n"
+  "  position {\n"
+  "    z: -0.2\n"
+  "  }\n"
+  "}\n"
+  ""
+  position {
+    x: 1849.0
+    y: 1282.0
+  }
+  scale3 {
+    x: 1.552161
+    y: 1.552161
+    z: 1.552161
+  }
+}
+embedded_instances {
+  id: "controller"
+  data: "components {\n"
+  "  id: \"modifiers-controller\"\n"
+  "  component: \"/main/gameplay/modifiers/modifiers-controller.script\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"modifiers-factory\"\n"
+  "  type: \"factory\"\n"
+  "  data: \"prototype: \\\"/main/gameplay/modifiers/modifier.go\\\"\\n"
+  "dynamic_prototype: true\\n"
+  "\"\n"
+  "}\n"
+  "embedded_components {\n"
+  "  id: \"title\"\n"
   "  type: \"label\"\n"
   "  data: \"size {\\n"
   "  x: 128.0\\n"
   "  y: 32.0\\n"
   "}\\n"
-  "text: \\\"Modifiers Screen Goes Here\\\"\\n"
+  "text: \\\"PLAYER [...] \\\\n"
+  "\\\"\\n"
+  "  \\\"Please choose a card\\\"\\n"
   "font: \\\"/builtins/fonts/default.font\\\"\\n"
   "material: \\\"/builtins/fonts/label-df.material\\\"\\n"
   "\"\n"
+  "  position {\n"
+  "    x: 1450.0\n"
+  "    y: 1550.0\n"
+  "  }\n"
   "  scale {\n"
-  "    x: 1.928\n"
-  "    y: 1.928\n"
-  "    z: 1.928\n"
+  "    x: 8.357952\n"
+  "    y: 8.357952\n"
+  "    z: 8.357952\n"
   "  }\n"
   "}\n"
   ""
-  position {
-    x: 1450.0
-    y: 850.0
-  }
 }

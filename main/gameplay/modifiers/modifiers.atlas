@@ -1,0 +1,7 @@
+images {
+  image: "/assets/Modifier Background.png"
+}
+images {
+  image: "/assets/Modifier Cover.png"
+}
+extrude_borders: 2

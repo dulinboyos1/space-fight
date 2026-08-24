@@ -7,7 +7,7 @@ local winnerScreenTime = 3
 
 local function showWinner(self, winner)
 	go.set("/winnerScreen#winner-label", "color", vmath.vector4(self.players[winner].colour[1], self.players[winner].colour[2], self.players[winner].colour[3], 1))
-	label.set_text("/winnerScreen#winner-label", "PLAYER "..winner.." WINS")
+	label.set_text("/winnerScreen#winner-label", "PLAYER ["..winner.."] WINS")
 	msg.post("/winnerScreen", "enable")
 end
 
@@ -23,9 +23,6 @@ local function unload_map()
 	msg.post("#map-proxy", "disable")
 	msg.post("#map-proxy", "final")
 	msg.post("#map-proxy", "unload")
-
-	msg.post("#modifiers-proxy", "load")
-	hideWinner()
 end
 
 local function spawn_players(self)
@@ -44,7 +41,7 @@ local function start_players(self, message)
 			colour = vmath.vector4(player.colour[1], player.colour[2], player.colour[3], 1)
 		})
 		self.players[player.number] = {
-			gamepad_id == gamepad_id,
+			gamepad_id = gamepad_id,
 			colour = player.colour,
 			id = id,
 			score = 0,
@@ -84,6 +81,9 @@ function on_message(self, message_id, message, sender)
 			load_map(maps[math.random(#maps)])
 			msg.post("map:/controller", "player_count", {count = #self.players})
 			spawn_players(self)
+		elseif self.mode == "MOD" then
+			hideWinner()
+			msg.post("modifiers:/controller", "init_parameters", {destroy_order = self.order, players = self.players})
 		end
 	elseif message_id == hash("proxy_unloaded") then
 		if self.mode == "MAP" then 
@@ -92,9 +92,11 @@ function on_message(self, message_id, message, sender)
 			msg.post("#modifiers-proxy", "load") -- start modifiers
 		end
 	elseif message_id == hash("round_over") then
-		--self.mode = "MOD"
+		self.mode = "MOD"
 		
 		local winner = message.order[#message.order]
+
+		self.order = message.order
 
 		self.players[winner].score = self.players[winner].score + 1
 		msg.post("/ui#gameplay", "set_score", {number = winner, score = self.players[winner].score})
@@ -103,5 +105,9 @@ function on_message(self, message_id, message, sender)
 		showWinner(self, winner)
 		
 		timer.delay(winnerScreenTime, false, unload_map)
+	elseif message_id == hash("picking_end") then
+		self.mode = "MAP"
+
+		msg.post("#modifiers-proxy", "unload")
 	end
 end

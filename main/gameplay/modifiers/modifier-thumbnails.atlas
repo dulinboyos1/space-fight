@@ -1,0 +1,4 @@
+images {
+  image: "/assets/modifier-thumbnails/example.png"
+}
+extrude_borders: 2

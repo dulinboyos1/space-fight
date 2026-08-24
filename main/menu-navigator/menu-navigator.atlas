@@ -4,4 +4,7 @@ images {
 images {
   image: "/assets/Remove Button Highlighter.png"
 }
+images {
+  image: "/assets/modifier-border.png"
+}
 extrude_borders: 2

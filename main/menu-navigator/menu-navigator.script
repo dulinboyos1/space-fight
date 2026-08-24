@@ -19,6 +19,10 @@ local function grid_get(self, index)
 	return self.grid[index[1]][index[2]]
 end
 
+local function change_colour(self, colour)
+	go.set(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "tint", colour)
+end
+
 local function move_to(self, new_index)
 	-- This function disables the current border and moves to the new border
 	-- If the index is nil then maintain the current index and don't disable any borders
@@ -28,7 +32,7 @@ local function move_to(self, new_index)
 		self.index = new_index
 	end
 	msg.post(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "enable")
-	go.set(msg.url(nil, grid_get(self, self.index).object, "menu-border"), "tint", self.colour)
+	change_colour(self, self.colour)
 end
 
 local function hide(self, hidden)
@@ -121,6 +125,8 @@ function on_message(self, message_id, message, sender)
 		move_to(self, find_next(self, {-1,0}))
 	elseif message_id == hash("right") and not self.hidden then	
 		move_to(self, find_next(self, {1,0}))
+	elseif message_id == hash("colour") then -- Force a colour update
+		change_colour(self, self.colour)
 	elseif message_id == hash("hide") then
 		hide(self, message.hidden)
 	elseif message_id == hash("update") then
