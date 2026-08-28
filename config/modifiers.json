@@ -13,93 +13,10 @@
 		"score":20,
 		"desc":"Fly like an eagle, piloting a blimp. Increased speed and slightly reduced health.",
 		"properties":{
-			"kinematics.speed":"+40%",
-			"health":"-10%"
+			"/kinematics.drag.longtitudinalTerminalVeclocity":"+40%",
+			"health":"-10%",
+			"#topSpeed":"+40%"
 		},
 		"img":"speed-up"
 	},
-	"Tank":{
-		"subtitle":"MASSIVE",
-		"score":40,
-		"desc":"Greatly increase health at the cost of speed.",
-		"properties":{
-			"kinematics.speed":"-80%",
-			"health":"+50%",
-			"/scale":"+10%"
-		},
-		"img":"tank"
-	},
-	"Hand Cannon":{
-		"subtitle":"Don't try this at home",
-		"score":80,
-		"desc":"Huge damage, but the firer is violently recoiled backwards.",
-		"properties":{
-			"bullet.damage":"+100%",
-			"health":"-20%",
-			"bullet.onTick":["recoil"],
-			"/bullet.recoil":"10",
-			"kinematics.speed":"-20%"
-		},
-		"img":"hand-cannon"
-	},
-	"Health Reduced":{
-		"subtitle":"You'll regret this",
-		"score":-60,
-		"desc":"Why you would pick this I have no idea, Slightly reduced health.",
-		"properties":{
-			"health":"-20%"
-		},
-		"img":"health-reduce"
-	},
-	"Tactical Nuke":{
-		"subtitle":"Incoming!!",
-		"score":100,
-		"desc":"Instant death, but your bullets are slow to move and fire.",
-		"properties":{
-			"bullet.damage":"200",
-			"bullet.onImpact":["explode"],
-			"/bullet.explodeRadius":"10",
-			"/bullet.scale":"+20%",
-			"bullet.speed":"-90%",
-			"weapon.magazine":"1",
-			"weapon.reloadTime":"500%"
-		},
-		"img":"nuke"
-	},
-	"Feather":{
-		"subtitle":"You hit like a slight draught",
-		"score":-50,
-		"desc":"Greatly reduced damage.",
-		"properties":{
-			"bullet.damage":"-60%"
-		},
-		"img":"feather"
-	},
-	"Chud":{
-		"subtitle":"Remeber to change this name",
-		"score":-20,
-		"desc":"Move like a fat little chud, Greatly reduced Speed.",
-		"properties":{
-			"kinematics.speed":"-60%"
-		},
-		"img":"speed-reduction"
-	},
-	"Extra Shots":{
-		"subtitle":"Why not just add bullets",
-		"score":20,
-		"desc":"Add some extra bullets to your magazine (Magazine always rounds down).",
-		"properties":{
-			"weapon.magazine":"150%"
-		},
-		"img":"more-bullets"
-	},
-	"Faster Reload":{
-		"subtitle":"Reload but faster..",
-		"score":10,
-		"desc":"Increased weapon reload speed",
-		"properties":{
-			"weapon.reloadTime":"-50%"
-		},
-		"img":"faster-reload"
-	}
 }

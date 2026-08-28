@@ -11,20 +11,95 @@ function init(self)
 	-- self.number
 	-- self.gamepad_id
 	-- self.colour
+
+	self.modifiers = {}
 	
-	self.characterProperties = {
-		[hash("/body")] = {["sprite"] = {tint = self.colour}},
-		[hash("/weapon")] = {["sprite"] = {tint = self.colour}},
-		[hash("/character")] = {["character"] = {gamepad_id = self.gamepad_id, tint = self.colour, number = self.number}}
-	}
+	self.defaults = json.decode(sys.load_resource("/config/defaults.json"))
 end
 
+local function getByPath(table, path)
+	local value = table
+	for key in path:gmatch("[^.]+") do
+		if type(value) ~= "table" then
+			return nil
+		end
+		value = value[key]
+	end
+	return value
+end
+
+local function setByPath(table, path, value)
+	local current = table
+	local last_key
+	for key in path:gmatch("[^.]+") do
+		if last_key then
+			if type(current[last_key]) ~= "table" then
+				current[last_key] = {}
+			end
+			current = current[last_key]
+		end
+		last_key = key
+	end
+	current[last_key] = value
+end 
+
+local function getModifiers(self)
+	local overrides = {}
+
+	for _, modifier in ipairs(self.modifiers) do
+		for _, property in ipairs(modifier.properties) do
+			if property.type == "VALUE" then
+				local change
+				local newValue
+				local currentValue = getByPath(overrides, property.name)
+				if currentValue == nil then
+					currentValue = getByPath(self.defaults, property.name)
+					if currentValue == nil then
+						error("CRITICAL ERROR IN PARSING MODIFIER PROPERTY, "..property.name, 0)
+					end
+				end 
+
+				-- Calculate change value
+				if property.factor == "ABS" then
+					change = property.value
+					print("Value change ABS: "..change)
+				elseif property.factor == "REL" then
+					change = currentValue * property.value / 100
+					print("Value change REL: "..change)
+				end
+
+				-- Perform action
+				if property.action == "SET" then
+					newValue = change
+				elseif property.action == "ADD" then
+					newValue = currentValue + change
+				elseif property.action == "SUB" then
+					newValue = currentValue - change
+				end
+				print(property.action)
+				print(newValue)
+
+				setByPath(overrides, property.name, newValue)
+			elseif property.type == "LIST" then
+				
+			elseif property.type == "DECOR" then
+				-- Do nothing
+			end
+		end
+	end
+
+	return overrides
+end
 function on_message(self, message_id, message, sender)
 	if message_id == hash("spawn_character") then
 		print("SPAWNING CHARACTER")
 		print(message.mapURL)
-		msg.post(message.mapURL, "spawn_character", {number = self.number, properties = self.characterProperties, colour = self.colour})
+		msg.post(message.mapURL, "spawn_character", {number = self.number, gamepad_id = self.gamepad_id, colour = self.colour, override = getModifiers(self)})
 	elseif message_id == hash("destroy_character") then
 		msg.post(message.mapURL, "destroy_character", {number = self.number})
+	elseif message_id == hash("add_modifier") then
+		for i, modifier in ipairs(message.modifiers) do
+			table.insert(self.modifiers, modifier)
+		end
 	end
 end

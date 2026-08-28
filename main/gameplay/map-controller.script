@@ -211,14 +211,18 @@ local function physics_listener(self, events)
 end
 
 local function spawn_character(self, message)
-	self.players[message.number] = collectionfactory.create("#character-factory",go.get_position(mapContent[hash("/spawn "..message.number)]), go.get_rotation(mapContent[hash("/spawn "..message.number)]), {}, characterScale)
-	for object, properties in pairs(message.properties) do
-		for fragment, values in pairs(properties) do
-			for property, value in pairs(values) do
-				go.set(msg.url("map", self.players[message.number][object], fragment), property, value)
-			end
-		end
-	end	
+	self.players[message.number] = collectionfactory.create("#character-factory",go.get_position(mapContent[hash("/spawn "..message.number)]), go.get_rotation(mapContent[hash("/spawn "..message.number)]), {
+		[hash("/character")] = {
+			tint = message.colour,
+			gamepad_id = message.gamepad_id,
+			number = message.number
+		}
+	}, characterScale)
+	
+	go.set(msg.url(nil, self.players[message.number]["/weapon"],"sprite"), "tint", message.colour)
+	go.set(msg.url(nil, self.players[message.number]["/body"],"sprite"), "tint", message.colour)
+	
+	msg.post(self.players[message.number]["/character"], "property_override", {override = message.override})
 end
 
 local function healthBarPrep(self)
@@ -296,8 +300,6 @@ function on_message(self, message_id, message, sender)
 			-- Prepare health once players are all loaded
 			healthBarPrep(self)
 		end
-	elseif message_id == hash("force_property") then
-		go.set(self.players[message.number], message.property, message.value)
 	elseif message_id == hash("debug_data") then
 		self.debug.data.physics = message.data
 		debug_menu_update(self)

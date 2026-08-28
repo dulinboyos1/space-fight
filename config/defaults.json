@@ -1,0 +1,56 @@
+{
+	"health": 100,
+	"kinematics": {
+		"acceleration": 1000,
+		"drag": {
+			"lateral_drag_constant": 0.0001,
+			"longtitudinal_drag_constant": 0.0001,
+			"lateral_terminal_velocity": 600,
+			"longtitudinal_terminal_velocity": 1000,
+			"drag_cap": 100000
+		},
+		"bounce_coefficient": 0.3
+	},
+	"shield": {
+		"time": 0.5,
+		"cooldownTime": 1,
+		"animTime": 0.1,
+		"minsize": [0.17, 0.17, 0.17],
+		"fullsize": [0.4, 0.4, 0.4]
+	},
+	"weapon": {
+		"fireTime": 0.1,
+		"magazine": 4,
+		"reloadTime": 3,
+		"repeating": false
+	},
+	"bullet": {
+		"init": [
+			"setVelocity",
+			"setOffset"
+		],
+		"onTick": [
+			"move"
+		],
+		"onImpact": [
+			"moveToEdge",
+			"damageIfPlayer",
+			"destroy"
+		],
+		"damage": 25,
+		"speed": 1500,
+		"tint": [1, 0.5, 0, 1],
+		"offset": 180
+	},
+	"boost": {
+		"acceleration": 3000,
+		"regenPause": 1,
+		"maxTime": 1,
+		"regenRate": 0.5
+	},
+	"trail": {
+		"maxTime": 0.05,
+		"lifeTime": 1,
+		"scale": 0.1
+	}
+}

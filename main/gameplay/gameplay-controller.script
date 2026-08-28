@@ -108,6 +108,15 @@ function on_message(self, message_id, message, sender)
 	elseif message_id == hash("picking_end") then
 		self.mode = "MAP"
 
+		for i, modifier in ipairs(message.modifiers) do
+			local player_modifier = {
+				title = modifier.title,
+				properties = modifier.properties
+			}
+			
+			msg.post(self.players[modifier.player].id, "add_modifier", {modifiers = {player_modifier}})
+		end
+		
 		msg.post("#modifiers-proxy", "unload")
 	end
 end

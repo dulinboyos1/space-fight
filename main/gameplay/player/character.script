@@ -26,8 +26,36 @@ end
 local function calculateDragCoefficients(self)
 	local config = self.kinematics.drag
 
-	config.lateral_drag_coefficient = self.kinematics.acceleration/(math.exp(config.lateral_drag_constant * config.lateral_terminal_velocity) - 1)
-	config.longtitudinal_drag_coefficient = self.kinematics.acceleration/(math.exp(config.longtitudinal_drag_constant * config.longtitudinal_terminal_velocity) - 1)
+
+	config.lateralDragCoefficient = self.kinematics.acceleration/(math.exp(config.lateralDragConstant * config.lateral_terminal_velocity) - 1)
+	config.longtitudinalDragCoefficieD = self.kinematics.acceleration/(math.exp(config.longtitudinalDragConstant * config.longtitudinal_terminal_velocity) - 1)
+end
+
+local function tableToVectorOverride(vector, list)
+	if types.is_vector3(vector) then
+		return #list > 0 and vmath.vector3(list[1] or vector.x,list[2] or vector.y,list[3] or vector.z) or vmath.vector3(list.x or vector.x,list.y or vector.y,list.z or vector.z)
+	elseif types.is_vector4(vector) then
+		return #list > 0 and vmath.vector4(list[1] or vector.x,list[2] or vector.y,list[3] or vector.z,list[4] or vector.w) or vmath.vector4(list.x or vector.x,list.y or vector.y,list.z or vector.z, list.w or vector.w)
+	elseif types.is_quat(vector) then
+		return #list > 0 and vmath.quat(list[1] or vector.x,list[2] or vector.y,list[3] or vector.z,list[4] or vector.w) or vmath.quat(list.x or vector.x,list.y or vector.y,list.z or vector.z, list.w or vector.w)
+	end
+	return vector -- Not actually a vector we can handle so leave it alone
+end
+
+local function mergeTables(base, override)
+	-- Recursively overwrite base using override
+	for key, value in pairs(override) do
+		if type(value) == "table" and type(base[key]) == "userdata" then
+			base[key] = tableToVectorOverride(base[key], value) -- Override vector components
+		elseif type(value) == "table" and #value == 0 and type(base[key]) == "table" and #value == 0 then
+			mergeTables(base[key], value)
+		else
+			base[key] = value
+			print("Overriding "..key.." with: ")
+			pprint(value)
+			print("--")
+		end
+	end
 end
 
 function init(self)
@@ -35,38 +63,41 @@ function init(self)
 
 	msg.post("#damageCircle", "disable")
 	msg.post("#shield", "disable")
+
+	local defaults = json.decode(sys.load_resource("/config/defaults.json"))
 	
 	self.velocity = vmath.vector3()
 	self.position = go.get_position()
 	self.rotation = go.get_rotation()
 	self.direction = vmath.vector3(1,0,0)
 
-	self.health = 100
+	-- IF A PROPERTY IS NIL IT MUST BE EDITED VIA /config/defaults.json and not here
+	
+	self.health = nil
 	
 	self.kinematics = {
-
-		accelerationDefault = 1000,
-		acceleration = 1000,
+		accelerationDefault = nil,
+		acceleration = nil, -- Exception
 		drag = {
-			lateral_drag_constant = 0.0001, -- Adjusts the smoothness of the exponetial drag growth (-1: decays up to TV, 0: UNDEFINED (straight line), 1: grows up to TV very very very quickly )
-			longtitudinal_drag_constant = 0.0001,
-			lateral_terminal_velocity = 600,
-			longtitudinal_terminal_velocity = 1000,
-			drag_cap = 100000,
+			lateralDragConstant = nil, -- Adjusts the smoothness of the exponetial drag growth (-1: decays up to TV, 0: UNDEFINED (straight line), 1: grows up to TV very very very quickly )
+			longtitudinalDragConstant = nil,
+			lateralTerminalVelocity = nil,
+			longtitudinalTerminalVelocity = nil,
+			dragCap = nil,
 		},
-		bounce_coefficient = 0.3
+		bounceCoefficient = nil
 
 	}
 
 	self.shield = {
-		time = 0.5,
-		cooldownTime = 1,
+		time = nil,
+		cooldownTime = nil,
 		cooldownTimeCurrent = 0,
 		cooldown = false,
-		animTime = 0.1,
+		animTime = nil,
 		status = false,
-		minsize = vmath.vector3(0.17, 0.17, 0.17),
-		fullsize = vmath.vector3(0.4, 0.4, 0.4),
+		minsize = vmath.vector3(),
+		fullsize = vmath.vector3(),
 		currentFrame = 1
 	}
 
@@ -88,43 +119,34 @@ function init(self)
 	self.weapon = {
 		rotation = vmath.quat(),
 		id = "weapon",
-		fireTime = 0.1,
+		fireTime = nil,
 		ammo = 0,
 		ammoFactory = "magazine#ammo-factory",
 		ammos = {}, -- An ordered list of ammo indicator objects
-		magazine = 4,
+		magazine = nil,
 		reloadBarMax = 281,
-		reloadTime = 3,
+		reloadTime = nil,
 		reloadTimeCurrent = 0,
-		repeating = false,
+		repeating = nil,
 		fired = false,
 		ready = true,
 	}
 
 	self.bullet = {
-		init = {
-			"setVelocity",
-			"setOffset"
-		},
-		onTick = {
-			"move"
-		},
-		onImpact = {
-			"moveToEdge",
-			"damageIfPlayer",
-			"destroy"
-		},
-		damage = 25,
-		speed = 1500,
-		tint = vmath.vector4(1, 0.5, 0, 1),
-		offset = 180 * go.get_scale().x
+		init = {},
+		onTick = {},
+		onImpact = {},
+		damage = nil,
+		speed = nil,
+		tint = vmath.vector4(),
+		offset = nil
 	}
 
 	self.boost = {
-		acceleration = 3000,
-		regenPause = 1,
-		maxTime = 1,
-		regenRate = 0.5,
+		acceleration = nil,
+		regenPause = nil,
+		maxTime = nil,
+		regenRate = nil,
 		regen = false,
 		time = 0,
 		handle = nil,
@@ -138,15 +160,26 @@ function init(self)
 	self.trail = {
 		id = "trail#trail-factory",
 		time = 0,
-		maxTime = 0.05,
+		maxTime = nil,
 		trails = {},
-		lifeTime = 1,
-		scale = 0.1
+		lifeTime = nil,
+		scale = nil
 	}
-	
-	self.kinematics.acceleration = self.kinematics.accelerationDefault
 
-	calculateDragCoefficients(self)		
+	mergeTables(self, defaults)
+	
+		
+end
+
+local function finaiseProperties(self)
+	self.kinematics.accelerationDefault = self.kinematics.acceleration
+
+	-- Add offset correction
+	self.bullet.offset = self.bullet.offset * go.get_scale().x
+
+	calculateDragCoefficients(self)
+
+	msg.post("/ui#map", "setHealth", {player = self.number, health = self.health})
 end
 
 local function move(self, dir, force)
@@ -287,7 +320,7 @@ function fixed_update(self, dt)
 	if (self.input.b or self.input.lShoulder) and self.boost.time > 0 and not self.locked then
 		timer.cancel(self.boost.handle)
 		self.boost.regen = false
-		self.kinematics.acceleration = self.boost.acceleration
+		self.kinematics.acceleration = self.kinematics.acceleration + self.boost.acceleration
 		self.boost.time = self.boost.time - dt
 
 	-- If currently regening and not full and not trying to boost
@@ -319,14 +352,14 @@ function fixed_update(self, dt)
 	local parallel_speed = vmath.dot(self.direction, -self.velocity)
 	local perpendicular_speed = vmath.dot(normal, -self.velocity)
 	
-	local parallel_drag = sign(parallel_speed) * (self.kinematics.drag.longtitudinal_drag_coefficient * math.exp(math.abs(parallel_speed) * self.kinematics.drag.longtitudinal_drag_constant) - self.kinematics.drag.longtitudinal_drag_coefficient)
-	local perpendicular_drag = sign(perpendicular_speed) * (self.kinematics.drag.lateral_drag_coefficient * math.exp(math.abs(perpendicular_speed) * self.kinematics.drag.lateral_drag_constant) - self.kinematics.drag.lateral_drag_coefficient)
+	local parallel_drag = sign(parallel_speed) * (self.kinematics.drag.longtitudinalDragCoefficient * math.exp(math.abs(parallel_speed) * self.kinematics.drag.longtitudinalDragConstant) - self.kinematics.drag.longtitudinalDragCoefficieD)
+	local perpendicular_drag = sign(perpendicular_speed) * (self.kinematics.drag.lateralDragCoefficient * math.exp(math.abs(perpendicular_speed) * self.kinematics.drag.lateralDragConstant) - self.kinematics.drag.lateralDragCoefficient)
 
 	-- Apply a cap to ensure the numbers don't go crazy
-	parallel_drag = math.min(parallel_drag, self.kinematics.drag.drag_cap)
-	parallel_drag = math.max(parallel_drag, -self.kinematics.drag.drag_cap)
-	perpendicular_drag = math.min(perpendicular_drag, self.kinematics.drag.drag_cap)
-	perpendicular_drag = math.max(perpendicular_drag, -self.kinematics.drag.drag_cap)
+	parallel_drag = math.min(parallel_drag, self.kinematics.drag.dragCap)
+	parallel_drag = math.max(parallel_drag, -self.kinematics.drag.dragCap)
+	perpendicular_drag = math.min(perpendicular_drag, self.kinematics.drag.dragCap)
+	perpendicular_drag = math.max(perpendicular_drag, -self.kinematics.drag.dragCap)
 	
 	local drag = self.direction * parallel_drag + normal * perpendicular_drag
 
@@ -363,8 +396,6 @@ function fixed_update(self, dt)
 		velocity = string.format("%.1f,%.1f", self.velocity.x, self.velocity.y),
 		speed = string.format("%.1f",vmath.length(self.velocity))}})
 
-	-- Health Updates
-	msg.post("/ui#map", "setHealth", {player = self.number, health = self.health})
 end
 
 
@@ -476,6 +507,11 @@ function on_message(self, message_id, message, sender)
 		if self.health <= 0 then -- Player is dead
 			destroyCharacter(self)
 		end
+	elseif message_id == hash("property_override") then
+		print("**** property override start PLAYER "..self.number.."*******************************************************")
+		mergeTables(self, message.override)
+
+		finaiseProperties(self)
 	end
 end
 
