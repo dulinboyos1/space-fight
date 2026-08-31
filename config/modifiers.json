@@ -13,10 +13,114 @@
 		"score":20,
 		"desc":"Fly like an eagle, piloting a blimp. Increased speed and slightly reduced health.",
 		"properties":{
-			"/kinematics.drag.longtitudinalTerminalVeclocity":"+40%",
+			"/kinematics.drag.longtitudinalTerminalVelocity":"+40%",
+			"kinematics.acceleration":"+10%",
 			"health":"-10%",
 			"#topSpeed":"+40%"
 		},
 		"img":"speed-up"
 	},
+	"Hand Cannon":{
+		"subtitle":"Don't try this at home",
+		"score":80,
+		"desc":"Huge damage, but the firer is violently recoiled backwards.",
+		"properties":{
+			"bullet.damage":"+100%",
+			"health":"-20%",
+			"bullet.init":["recoil"],
+			"kinematics.acceleration":"-20%"
+		},
+		"img":"hand-cannon"
+	},
+	"Extra Shots":{
+		"subtitle":"Why not just add bullets",
+		"score":20,
+		"desc":"Add some extra bullets to your magazine (Magazine always rounds down).",
+		"properties":{
+			"weapon.magazine":"150%"
+		},
+		"img":"more-bullets"
+	},
+	"Faster Reload":{
+		"subtitle":"Reload but faster..",
+		"score":10,
+		"desc":"Increased weapon reload speed",
+		"properties":{
+			"weapon.reloadTime":"-50%"
+		},
+		"img":"faster-reload"
+	},
+	"Machine Gun":{
+		"subtitle":"Brrrrrrr",
+		"score":10,
+		"desc":"Switch to full auto",
+		"properties":{
+			"/weapon.repeating":"1",
+			"weapon.magazine":"+4",
+			"weapon.fireTime":"-20%",
+			"weapon.reloadTime":"-20%",
+			"weapon.inaccuracy":"+5"
+		},
+		"img":"machine-gun"
+	},
+	"Tank":{
+		"subtitle":"MASSIVE",
+		"score":40,
+		"desc":"Greatly increase health at the cost of speed.",
+		"properties":{
+			"kinematics.acceleration":"-80%",
+			"/kinematics.drag.longtitudinalTerminalVelocity":"-40%",
+			"#topSpeed":"-40%",
+			"health":"+50%"
+		},
+		"img":"tank"
+	},
+	"All Rounder":{
+		"subtitle":"",
+		"score":20,
+		"desc":"Slightly increase many stats",
+		"properties":{
+			"#topSpeed":"+5%",
+			"kinematics.acceleration":"+5%",
+			"bullet.damage":"+5%",
+			"health":"+5%",
+			"/kinematics.drag.longtitudinalTerminalVelocity":"+5%"
+		},
+		"img":"all-rounder"
+	},
+	"Bigger Boost":{
+		"subtitle":"Go off like a rocket",
+		"score":20,
+		"desc":"Incresed boost power, regen and duration.",
+		"properties":{
+			"/boost.maxTime":"200%",
+			"#boostTime":"200%",
+			"boost.regenRate":"+0.5",
+			"/boost.acceleration":"120%",
+			"#boostPower":"120%"
+		},
+		"img":"big-boost"
+	},
+	"Railgun":{
+		"subtitle":"Like a laser",
+		"score":40,
+		"desc":"Grealty increased bullet speed, at the cost of damage and fire rate.",
+		"properties":{
+			"/bullet.speed":"200%",
+			"#bulletSpeed":"200%",
+			"bullet.damage":"-10%",
+			"weapon.fireTime":"+20%"
+		},
+		"img":"railgun"
+	},
+	"Bouncy bullet":{
+		"subtitle":"Bullets Bounce",
+		"score":20,
+		"desc":"Bullets will reflect off walls",
+		"properties":{
+			"bullet.bounces":"+2",
+			"bullet.onImpact":["bounce"]
+		},
+		"img":"bouncy"
+	}
 }

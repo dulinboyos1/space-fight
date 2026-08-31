@@ -3,13 +3,13 @@
 	"kinematics": {
 		"acceleration": 1000,
 		"drag": {
-			"lateral_drag_constant": 0.0001,
-			"longtitudinal_drag_constant": 0.0001,
-			"lateral_terminal_velocity": 600,
-			"longtitudinal_terminal_velocity": 1000,
-			"drag_cap": 100000
+			"lateralDragConstant": 0.0001,
+			"longtitudinalDragConstant": 0.0001,
+			"lateralTerminalVelocity": 600,
+			"longtitudinalTerminalVelocity": 1000,
+			"dragCap": 100000
 		},
-		"bounce_coefficient": 0.3
+		"bounceCoefficient": 0.3
 	},
 	"shield": {
 		"time": 0.5,
@@ -22,7 +22,8 @@
 		"fireTime": 0.1,
 		"magazine": 4,
 		"reloadTime": 3,
-		"repeating": false
+		"repeating": false,
+		"inaccuracy": 0
 	},
 	"bullet": {
 		"init": [
@@ -34,13 +35,13 @@
 		],
 		"onImpact": [
 			"moveToEdge",
-			"damageIfPlayer",
-			"destroy"
+			"damageIfPlayer"
 		],
 		"damage": 25,
 		"speed": 1500,
 		"tint": [1, 0.5, 0, 1],
-		"offset": 180
+		"offset": 180,
+		"bounces": 0
 	},
 	"boost": {
 		"acceleration": 3000,

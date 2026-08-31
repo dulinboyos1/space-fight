@@ -23,4 +23,10 @@ images {
   image: "/assets/Orange Square.png"
   pivot_y: 1.0
 }
+images {
+  image: "/assets/Main Menu Button.png"
+}
+images {
+  image: "/assets/Rematch Button.png"
+}
 extrude_borders: 2

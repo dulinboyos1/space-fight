@@ -46,11 +46,14 @@ end
 local function getModifiers(self)
 	local overrides = {}
 
+	
+
 	for _, modifier in ipairs(self.modifiers) do
 		for _, property in ipairs(modifier.properties) do
 			if property.type == "VALUE" then
 				local change
 				local newValue
+
 				local currentValue = getByPath(overrides, property.name)
 				if currentValue == nil then
 					currentValue = getByPath(self.defaults, property.name)
@@ -81,7 +84,24 @@ local function getModifiers(self)
 
 				setByPath(overrides, property.name, newValue)
 			elseif property.type == "LIST" then
+				local currentValue = getByPath(overrides, property.name)
+				if currentValue == nil then
+					currentValue = getByPath(self.defaults, property.name)
+					if currentValue == nil then
+						error("CRITICAL ERROR IN PARSING MODIFIER PROPERTY, "..property.name, 0)
+					end
+				end 
 				
+				for i, value in pairs(property.value) do
+					local present
+					for _, element in ipairs(currentValue) do
+						present = present or value == element
+					end
+					if not present then
+						table.insert(currentValue, value) -- Because the currentValue was collected by the getByPath function
+					end
+				end
+				setByPath(overrides, property.name, currentValue) -- It will need to be rewritten
 			elseif property.type == "DECOR" then
 				-- Do nothing
 			end

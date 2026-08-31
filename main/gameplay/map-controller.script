@@ -7,7 +7,9 @@ local BlankTint = vmath.vector4(1, 1, 1, 0.6)
 local Debug = "/debug"
 local DebugTint = vmath.vector4(1, 1, 1, 0.5) 
 
-local characterScale = 0.4
+local characterScale = 0.4 -- Adjust the size of characters
+local aimIndicator = false -- Adds a large box showing where each character is aiming
+local highContrast = true -- Disables backgrounds for more contrast
 
 local bulletFactory = "#bullet-factory"
 
@@ -16,6 +18,8 @@ local mapContent = {}
 local healthReady = false
 local playersReady = false
 local loadingDone = false
+
+local bulletCallbacks = require("config.bullet-callbacks")
 
 local function debug_menu_prep(self)
 	go.set(Debug.."/menu#background", "tint", DebugTint)
@@ -72,51 +76,14 @@ local function load_map(name)
 	collectionfactory.load("#"..name.."-factory", function(self, url, result)
 		if result then
 			mapContent = collectionfactory.create(url)
+			if highContrast then
+				msg.post(mapContent["/background"], "disable")
+			end
 			mapReady = true
 		end
 	end)
 end
 
--- Bullet callbacks -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-local initCallbacks = {
-	setVelocity = function(id, bullet)
-		bullet.velocity = vmath.rotate(bullet.rotation, vmath.vector3(0, bullet.speed, 0))
-	end,
-	setOffset = function(id, bullet)
-		bullet.position = bullet.position + vmath.rotate(bullet.rotation, vmath.vector3(0, bullet.offset, 0))
-	end
-}
-
-local updateCallbacks = {
-	move = function(id, bullet, dt)
-		bullet.position = bullet.position + bullet.velocity * dt
-	end,
-}
-
-local impactCallbacks = {
-	moveToEdge = function(id, bullet, bullets, event, other_event, type)
-		bullet.position = bullet.position + event.normal * event.distance
-	end,
-	damageIfPlayer = function(id, bullet, bullets, event, other_event, type)
-		if type == hash("player_damage") and not go.get(msg.url(nil, other_event.id, "character"), "shieldExport") then
-			msg.post(other_event.id, "damage", {damage = bullet.damage})
-		elseif type == hash("player_damage") then
-			bullet.velocity = -bullet.velocity
-			bullet.doNotDestroy = true
-		end
-	end,
-	destroy = function(id, bullet, bullets, event, other_event, type)
-		if not bullet.doNotDestroy then
-			bullets[id] = nil
-			go.delete(id, false)
-		end
-		bullet.doNotDestroy = false
-	end
-}
-
-
--- Bullet callbacks end-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 
 local function create_bullet(position, rotation, tint)
@@ -125,36 +92,44 @@ local function create_bullet(position, rotation, tint)
 	return bulletId
 end
 
-local function init_bullet(id, bullet)
+local function init_bullet(id, bullet, sender)
 	for i, callback in ipairs(bullet.init) do
-		initCallbacks[callback](id, bullet)
+		bulletCallbacks.init[callback](id, bullet, sender)
 	end
 	go.set_position(bullet.position, id)
 end
 
 local function impact_bullet(id, bullet, bullets, own_event, other_event, type)
 	for i, callback in ipairs(bullet.onImpact) do
-		impactCallbacks[callback](id, bullet, bullets, own_event, other_event, type)
+		bulletCallbacks.impact[callback](id, bullet, bullets, own_event, other_event, type)
 	end
-	go.set_position(bullet.position, id)
+	if bullet.doNotDestroy then
+		go.set_position(bullet.position, id)
+		bullet.doNotDestroy = false
+	else
+		go.delete(id, true)
+		bullets[id] = nil
+	end
 end
 
 local function update_bullet(id, bullet, bullets, dt)
 	for i, callback in ipairs(bullet.onTick) do
-		updateCallbacks[callback](id, bullet, dt)
+		bulletCallbacks.update[callback](id, bullet, dt)
 	end
-	go.set_position(bullet.position, id)
 
 	-- Hard boundary protection
 	if bullet.position.x > 2900 then -- If outside on the right
-		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(-1, 0, 0), distance = 2900 - bullet.position.x}, {}, "border")
+		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(-1, 0, 0), distance = 2900 - bullet.position.x}, {}, hash("border"))
 	elseif bullet.position.x < 0 then -- If outside on the left
-		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(1, 0, 0), distance = -bullet.position.x}, {}, "border")
+		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(1, 0, 0), distance = -bullet.position.x}, {}, hash("border"))
 	elseif bullet.position.y > 1700 then -- If outside at the top
-		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(0, -1, 0), distance = 1700 - bullet.position.y}, {}, "border")
+		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(0, -1, 0), distance = 1700 - bullet.position.y}, {}, hash("border"))
 	elseif bullet.position.y < 0 then -- If outside at the bottom
-		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(0, 1, 0), distance = -bullet.position.y}, {}, "border")
+		impact_bullet(id, bullet, bullets, {normal = vmath.vector3(0, 1, 0), distance = -bullet.position.y}, {}, hash("border"))
 	end
+
+	go.set_position(bullet.position, id)
+	go.set_rotation(bullet.rotation, id)
 end
 
 local function physics_listener(self, events)
@@ -215,7 +190,8 @@ local function spawn_character(self, message)
 		[hash("/character")] = {
 			tint = message.colour,
 			gamepad_id = message.gamepad_id,
-			number = message.number
+			number = message.number,
+			aimIndicator = aimIndicator
 		}
 	}, characterScale)
 	
@@ -311,7 +287,7 @@ function on_message(self, message_id, message, sender)
 		
 		self.bullets[bulletId] = message.properties
 
-		init_bullet(bulletId, bullet)
+		init_bullet(bulletId, bullet, sender)
 	elseif message_id == hash("player_count") then
 		self.playerCount = message.count
 	elseif message_id == hash("character_destroyed") then

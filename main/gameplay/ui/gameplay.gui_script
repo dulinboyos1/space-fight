@@ -14,6 +14,15 @@ function on_message(self, message_id, message, sender)
 			local colour = vmath.vector4(message[i].colour[1],message[i].colour[2],message[i].colour[3], alpha)
 			gui.set_color(gui.get_node("template"..i), colour) -- Set the templates colour
 		end
+	elseif message_id == hash("restart") then
+		for i = 1,4 do
+			for _, circle in pairs(self.circles[i]) do
+				gui.delete_node(circle)
+			end
+		end
+		self.scores = {0,0,0,0}
+		self.circles = {{}, {}, {}, {}}
+		msg.post(".", "start", message)
 	elseif message_id == hash("set_score") then
 		if self.scores[message.number] == message.score then
 			return

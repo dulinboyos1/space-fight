@@ -1,4 +1,13 @@
 images {
   image: "/assets/maps/map1.png"
 }
+images {
+  image: "/assets/maps/big-plus.png"
+}
+images {
+  image: "/assets/maps/corners.png"
+}
+images {
+  image: "/assets/maps/planets.png"
+}
 extrude_borders: 2
