@@ -24,6 +24,12 @@ embedded_instances {
   "  data: \"collection: \\\"/main/gameplay/gameplay.collection\\\"\\n"
   "\"\n"
   "}\n"
+  "embedded_components {\n"
+  "  id: \"settings\"\n"
+  "  type: \"collectionproxy\"\n"
+  "  data: \"collection: \\\"/main/settings/settings.collection\\\"\\n"
+  "\"\n"
+  "}\n"
   ""
 }
 embedded_instances {
@@ -121,6 +127,6 @@ embedded_instances {
   ""
   position {
     y: 850.0
-    z: 0.1
+    z: 1.0
   }
 }

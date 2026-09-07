@@ -1,19 +1,26 @@
 local maxHealth = 100
 
-local sizeX = 527.5
+local settings = require("main.settings.settings")
+
+local sizeX = 527
 local sizeY = 50
 local sizeZ = 0
 
 local alpha = 0.5
 
 function init(self)
+	gui.set_scale(gui.get_node("healthbars"), vmath.vector3(settings.graphics.guiScale, settings.graphics.guiScale, 1))
 
+	print("Subscribing to settings changes as "..msg.url())
+	settings.subscribers[tostring(msg.url())] = msg.url() -- Add to the list of subscribers we index by url to prevent duplicates
+	
 end
 
 function on_message(self, message_id, message, sender)
 	if message_id == hash("start") then
 		-- Prepare the healthbar
 		for i = 1,4 do
+			gui.set_position(gui.get_node("clip"..i), vmath.vector3())
 			if message["player"..i] then
 				local colour = message["player"..i].colour
 				if colour ~= nil then
@@ -30,5 +37,17 @@ function on_message(self, message_id, message, sender)
 			message.health = 0
 		end
 		gui.set_size(gui.get_node("clip"..message.player), vmath.vector3(sizeX * message.health/maxHealth, sizeY, sizeZ))
+	elseif message_id == hash("settingsChange") then
+		-- Recalculate GUI scale
+		gui.set_scale(gui.get_node("healthbars"), vmath.vector3(settings.graphics.guiScale, settings.graphics.guiScale, 1))
+	elseif message_id == hash("hide") then
+		gui.set_enabled(gui.get_node("healthbars"), false)
+	elseif message_id == hash("show") then
+		gui.set_enabled(gui.get_node("healthbars"), true)
 	end
 end
+
+function final(self)
+	print("Removing subscription "..msg.url())
+	settings.subscribers[tostring(msg.url())] = nil -- Remove the subscription
+end	

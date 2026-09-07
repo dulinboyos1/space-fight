@@ -54,6 +54,13 @@ embedded_instances {
   "load_dynamically: true\\n"
   "\"\n"
   "}\n"
+  "embedded_components {\n"
+  "  id: \"corridors-factory\"\n"
+  "  type: \"collectionfactory\"\n"
+  "  data: \"prototype: \\\"/main/gameplay/maps/corridors.collection\\\"\\n"
+  "load_dynamically: true\\n"
+  "\"\n"
+  "}\n"
   ""
 }
 embedded_instances {
@@ -103,7 +110,7 @@ embedded_instances {
   position {
     x: 1450.0
     y: 850.0
-    z: 1.0
+    z: 0.5
   }
 }
 embedded_instances {

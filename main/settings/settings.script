@@ -1,0 +1,180 @@
+local settings = require("main.settings.settings")
+
+local settingsMetadata = json.decode(sys.load_resource("/config/settings-metadata.json"))
+
+local sliderMaxSize = 375
+
+local backgroundTint = vmath.vector4(0, 0, 0, 0.6)
+
+local debounce = false
+local debounceTimer = nil
+
+local function broadcastChange()
+	print("Begin broadcast")
+	pprint(settings.subscribers)
+	for urlKey, url in pairs(settings.subscribers) do
+		print("Broadcasting to "..url)
+		msg.post(url, "settingsChange")
+	end
+end
+
+-- local function mergeTables(base, override)
+-- 	-- Recursively overwrite base using override
+-- 	for key, value in pairs(override) do
+-- 		if type(value) == "table" and type(base[key]) == "userdata" then
+-- 			base[key] = tableToVectorOverride(base[key], value) -- Override vector components
+-- 		elseif type(value) == "table" and #value == 0 and type(base[key]) == "table" and #value == 0 then
+-- 			mergeTables(base[key], value)
+-- 		else
+-- 			base[key] = value
+-- 		end
+-- 	end
+-- end
+
+
+local function forAllSettings(metadataNode, settingsNode, fn)
+	for name, metadata in pairs(metadataNode) do
+		if type(metadata) == "table" and metadata["type"] then  -- We know it's a valid entry if it has a value for type
+			fn(name, settingsNode, metadata) -- So perform the arbitray function on it
+		elseif type(metadata) == "table" then
+			-- Otherwise look through the next table and add any settings in there
+			forAllSettings(metadata, settingsNode[name], fn)
+		end
+	end
+end
+
+local function updateSetting(name, parent, metadata)
+	if metadata.type == "slider" then
+		go.set(msg.url(nil, name, "slider"), "size.x", sliderMaxSize / (metadata.max - metadata.min) * (parent[name] - metadata.min))
+		label.set_text(msg.url(nil, name, "value"), string.format("%.1f", parent[name]))
+	elseif metadata.type == "checkbox" then
+		if parent[name] then
+			sprite.play_flipbook(msg.url(nil, name, "checkbox"), "Checkbox True")
+		else
+			sprite.play_flipbook(msg.url(nil, name, "checkbox"), "Checkbox False")
+		end
+	end
+end
+	
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+
+	go.set("settings-holder#background", "tint", backgroundTint)
+	go.set("settings-holder#background1", "tint", backgroundTint)
+	go.set("settings-holder#background2", "tint", backgroundTint)
+	go.set("settings-holder#background3", "tint", backgroundTint)
+	go.set("settings-holder#background4", "tint", backgroundTint)
+	
+	msg.post("/menu#saved-message", "disable")
+	
+	local layout = { -- Layout for the menu navigator
+		metadata = {
+			starting_index = {1 , 1},
+			size = {1, 0} -- Unknown, will be larger later
+		},
+		layout = {}
+	}
+
+	local layoutExpansion = {} -- Extra data for menu navigator
+
+	local firstData
+	
+	forAllSettings(settingsMetadata, settings, function(name, parent, metadata)  -- Apply a function to all settings
+		-- Safety check for if a setting hasn't been implemented yet 
+		if not go.exists(msg.url(nil, name, nil)) then return end
+		
+		updateSetting(name, parent, metadata)
+
+		if metadata.order == 1 then
+			firstData = {name = name, parent = parent, metadata = metadata}
+		end
+
+		layout.metadata.size[2] = layout.metadata.size[2] + 1
+		
+		if metadata.order < 15 then
+			layout.layout[name] = {
+				index = {1, metadata.order},
+				object = name
+			}
+		else
+			layoutExpansion[name] = {
+				index = {1, metadata.order},
+				object = name
+			}
+		end
+	end)
+
+	self.selected = firstData
+
+	msg.post("/menu-navigator", "layout-expansion", layoutExpansion)
+	msg.post("/menu-navigator", "start", layout)
+end
+
+function on_input(self, action_id, action)
+	if not action.pressed then return end
+	if action_id == hash("B") then
+		msg.post("main:/controller#main", "unload", {collection = "settings"})
+	elseif action_id == hash("Lstick_up") then
+		debounce = true
+		msg.post("/menu-navigator", "up")
+		msg.post("/menu-navigator", "select")
+	elseif action_id == hash("Lstick_down") then
+		debounce = true
+		msg.post("/menu-navigator", "down")
+		msg.post("/menu-navigator", "select")
+	elseif action_id == hash("Lstick_left") then
+		if self.selected.metadata.type == "slider" then
+			debounce = true
+			local newValue = self.selected.parent[self.selected.name] - self.selected.metadata.step
+			self.selected.parent[self.selected.name] = math.max(newValue, self.selected.metadata.min)
+			updateSetting(self.selected.name, self.selected.parent, self.selected.metadata)
+		end
+	elseif action_id == hash("Lstick_right") then
+		if self.selected.metadata.type == "slider" then
+			local newValue = self.selected.parent[self.selected.name] + self.selected.metadata.step
+			self.selected.parent[self.selected.name] = math.min(newValue, self.selected.metadata.max)
+			updateSetting(self.selected.name, self.selected.parent, self.selected.metadata)
+		end
+	elseif action_id == hash("A") then
+		if self.selected.metadata.type == "checkbox" then
+			self.selected.parent[self.selected.name] = not self.selected.parent[self.selected.name]
+			updateSetting(self.selected.name, self.selected.parent, self.selected.metadata)
+		end
+	elseif action_id == hash("X") then
+		-- Save
+		sys.save(sys.get_save_file("space-fight", "settings"), settings)
+		
+		msg.post("/menu#saved-message", "enable")
+		timer.delay(3, false, function(self, handle, elapsed_time)
+			msg.post("/menu#saved-message", "disable")
+		end)
+	end
+end
+
+function on_message(self, message_id, message, sender)
+	if message_id == hash("settingsStart") then
+		self.mode = message.mode
+	elseif message_id == hash("navigator_select") then
+		forAllSettings(settingsMetadata, settings, function(name, parent, metadata)
+			if name == message.selected then
+				self.selected = {name = name, parent = parent, metadata = metadata}
+				local position = go.get_world_position(msg.url(nil, name, nil)) 
+				if position.y < 200 then
+					go.set_position(go.get_position("/settings-holder") + vmath.vector3(0, 300 - position.y, 0), "/settings-holder")
+				elseif position.y > 1500 then
+					go.set_position(go.get_position("/settings-holder") + vmath.vector3(0, 1400 - position.y, 0), "/settings-holder")
+				end
+			end
+		end)
+	end
+end
+
+function final(self)
+	broadcastChange()
+	if self.mode == "MAIN-MENU" then
+		msg.post("main-menu:/controller#main-menu", "settingsDone")
+	elseif self.mode == "PAUSE-MENU" then
+		msg.post("gameplay:/controller#gameplay-controller", "settingsDone")
+	end
+end

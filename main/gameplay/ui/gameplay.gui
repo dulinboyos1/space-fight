@@ -7,6 +7,13 @@ nodes {
   position {
     x: 2900.0
   }
+  type: TYPE_BOX
+  id: "scores"
+  inherit_alpha: true
+  alpha: 0.0
+  size_mode: SIZE_MODE_AUTO
+}
+nodes {
   scale {
     x: 0.3
     y: 0.3
@@ -14,6 +21,7 @@ nodes {
   type: TYPE_BOX
   id: "score1"
   pivot: PIVOT_SE
+  parent: "scores"
   inherit_alpha: true
   alpha: 0.0
   size_mode: SIZE_MODE_AUTO
@@ -37,7 +45,6 @@ nodes {
 }
 nodes {
   position {
-    x: 2900.0
     y: 150.0
   }
   scale {
@@ -47,6 +54,7 @@ nodes {
   type: TYPE_BOX
   id: "score4"
   pivot: PIVOT_SE
+  parent: "scores"
   inherit_alpha: true
   alpha: 0.0
   size_mode: SIZE_MODE_AUTO
@@ -70,7 +78,6 @@ nodes {
 }
 nodes {
   position {
-    x: 2900.0
     y: 50.0
   }
   scale {
@@ -80,6 +87,7 @@ nodes {
   type: TYPE_BOX
   id: "score2"
   pivot: PIVOT_SE
+  parent: "scores"
   inherit_alpha: true
   alpha: 0.0
   size_mode: SIZE_MODE_AUTO
@@ -103,7 +111,6 @@ nodes {
 }
 nodes {
   position {
-    x: 2900.0
     y: 100.0
   }
   scale {
@@ -113,6 +120,7 @@ nodes {
   type: TYPE_BOX
   id: "score3"
   pivot: PIVOT_SE
+  parent: "scores"
   inherit_alpha: true
   alpha: 0.0
   size_mode: SIZE_MODE_AUTO

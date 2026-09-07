@@ -18,5 +18,6 @@ scale_mode = stretch
 
 [project]
 title = Space Fight
-custom_resources = config/
+custom_resources = config/, data/
+bundle_resources = 
 

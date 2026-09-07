@@ -1,0 +1,90 @@
+{
+	"graphics":{
+		"guiScale":{"min":0.5,"max":2,"step":0.1,"type":"slider", "order":1}
+	},
+	"accessibility":{
+		"highContrast":{"type":"checkbox","order":19},
+		"aimIndicator":{"type":"checkbox","order":20},
+		"characterScale":{"min":0.5,"max":2,"step":0.1,"type":"slider","order":21}
+	},
+	"gameplay":{
+		"maps":{
+			"map1":{"type":"checkbox","order":3},
+			"big-plus":{"type":"checkbox","order":4},
+			"corners":{"type":"checkbox","order":5},
+			"planets":{"type":"checkbox","order":6},
+			"corridors":{"type":"checkbox","order":7}
+		},
+		"modifiers":{
+			"Health Boost":{"type":"checkbox","order":8},
+			"Speed Up":{"type":"checkbox","order":9},
+			"Cannon":{"type":"checkbox","order":10},
+			"Extra Shots":{"type":"checkbox","order":11},
+			"Faster Reload":{"type":"checkbox","order":12},
+			"Machine Gun":{"type":"checkbox","order":13},
+			"Tank":{"type":"checkbox","order":14},
+			"All Rounder":{"type":"checkbox","order":15},
+			"Bigger Boost":{"type":"checkbox","order":16},
+			"Railgun":{"type":"checkbox","order":17},
+			"Bouncy Bullet":{"type":"checkbox","order":18}
+		},
+		"roundsToWin":{"min":1,"max":10,"step":1,"type":"slider","order":2}
+	},
+	"defaults":{
+		"health": 100,
+		"kinematics": {
+			"acceleration": 1000,
+			"drag": {
+				"lateralDragConstant": 0.0001,
+				"longtitudinalDragConstant": 0.0001,
+				"lateralTerminalVelocity": 600,
+				"longtitudinalTerminalVelocity": 1000,
+				"dragCap": 100000
+			},
+			"bounceCoefficient": 0.3
+		},
+		"shield": {
+			"time": 0.5,
+			"cooldownTime": 1,
+			"animTime": 0.1,
+			"minsize": [0.17, 0.17, 0.17],
+			"fullsize": [0.4, 0.4, 0.4]
+		},
+		"weapon": {
+			"fireTime": 0.1,
+			"magazine": 4,
+			"reloadTime": 3,
+			"repeating": false,
+			"inaccuracy": 0
+		},
+		"bullet": {
+			"init": [
+				"setVelocity",
+				"setOffset"
+			],
+			"onTick": [
+				"move"
+			],
+			"onImpact": [
+				"moveToEdge",
+				"damageIfPlayer"
+			],
+			"damage": 25,
+			"speed": 1500,
+			"tint": [1, 0.5, 0, 1],
+			"offset": 180,
+			"bounces": 0
+		},
+		"boost": {
+			"acceleration": 3000,
+			"regenPause": 1,
+			"maxTime": 1,
+			"regenRate": 0.5
+		},
+		"trail": {
+			"maxTime": 0.05,
+			"lifeTime": 1,
+			"scale": 0.1
+		}
+	}
+}

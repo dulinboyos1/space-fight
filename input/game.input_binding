@@ -78,3 +78,11 @@ gamepad_trigger {
   input: GAMEPAD_LSHOULDER
   action: "Lshoulder"
 }
+gamepad_trigger {
+  input: GAMEPAD_START
+  action: "Pause"
+}
+gamepad_trigger {
+  input: GAMEPAD_RPAD_LEFT
+  action: "X"
+}

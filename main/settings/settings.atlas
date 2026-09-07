@@ -1,0 +1,29 @@
+images {
+  image: "/assets/Black Box.png"
+  pivot_x: 0.0
+  pivot_y: 0.0
+}
+images {
+  image: "/assets/Setting Base.png"
+  pivot_x: 0.0
+}
+images {
+  image: "/assets/Setting Slider Base.png"
+}
+images {
+  image: "/assets/Setting Slider.png"
+  pivot_x: 0.0
+}
+images {
+  image: "/assets/Setting Menu Highlighter.png"
+}
+images {
+  image: "/assets/Save Button.png"
+}
+images {
+  image: "/assets/Checkbox False.png"
+}
+images {
+  image: "/assets/Checkbox True.png"
+}
+extrude_borders: 2

@@ -10,4 +10,7 @@ images {
 images {
   image: "/assets/maps/planets.png"
 }
+images {
+  image: "/assets/maps/Corridors.png"
+}
 extrude_borders: 2

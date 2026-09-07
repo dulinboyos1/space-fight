@@ -20,7 +20,7 @@
 		},
 		"img":"speed-up"
 	},
-	"Hand Cannon":{
+	"Cannon":{
 		"subtitle":"Don't try this at home",
 		"score":80,
 		"desc":"Huge damage, but the firer is violently recoiled backwards.",
@@ -51,7 +51,7 @@
 		"img":"faster-reload"
 	},
 	"Machine Gun":{
-		"subtitle":"Brrrrrrr",
+		"subtitle":"B",
 		"score":10,
 		"desc":"Switch to full auto",
 		"properties":{
@@ -59,7 +59,8 @@
 			"weapon.magazine":"+4",
 			"weapon.fireTime":"-20%",
 			"weapon.reloadTime":"-20%",
-			"weapon.inaccuracy":"+5"
+			"weapon.inaccuracy":"+5",
+			"bullet.damage":"40%"
 		},
 		"img":"machine-gun"
 	},
@@ -113,7 +114,7 @@
 		},
 		"img":"railgun"
 	},
-	"Bouncy bullet":{
+	"Bouncy Bullet":{
 		"subtitle":"Bullets Bounce",
 		"score":20,
 		"desc":"Bullets will reflect off walls",
@@ -122,5 +123,31 @@
 			"bullet.onImpact":["bounce"]
 		},
 		"img":"bouncy"
+	},
+	"Explosions":{
+		"subtitle":"Now with RTX graphics",
+		"score":20,
+		"desc":"Bullets explode on impact",
+		"properties":{
+			"bullet.onImpact":["explode"],
+			"bullet.damage":"-10%"
+		},
+		"img":"none"
+	},
+	"Arc":{
+		"subtitle":"Not the boat",
+		"score":20,
+		"desc":"Fire bullets almost instantly but lose your ability to aim",
+		"properties":{
+			"/weapon.repeating":"1",
+			"/bullet.speed":"50%",
+			"#bulletSpeed":"50%",
+			"weapon.magazine":"+4",
+			"weapon.fireTime":"0",
+			"weapon.reloadTime":"+200%",
+			"weapon.inaccuracy":"+90",
+			"bullet.damage":"-10%"
+		},
+		"img":"none"
 	}
 }

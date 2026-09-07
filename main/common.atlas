@@ -29,4 +29,7 @@ images {
 images {
   image: "/assets/Rematch Button.png"
 }
+images {
+  image: "/assets/Resume Button.png"
+}
 extrude_borders: 2

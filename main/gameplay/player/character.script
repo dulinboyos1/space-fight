@@ -7,6 +7,8 @@ go.property("aimIndicator", false)
 go.property("shieldExport", false)
 go.property("velocity", vmath.vector3())
 
+local settings = require("main.settings.settings")
+
 local damageTime = 0.1
 
 local function sign(x)
@@ -71,8 +73,6 @@ function init(self)
 		msg.post("weapon#aimIndicator", "disable")
 	end
 
-	local defaults = json.decode(sys.load_resource("/config/defaults.json"))
-	
 	self.velocity = vmath.vector3()
 	self.position = go.get_position()
 	self.rotation = go.get_rotation()
@@ -174,7 +174,7 @@ function init(self)
 		scale = nil
 	}
 
-	mergeTables(self, defaults)
+	mergeTables(self, settings.defaults)
 	
 		
 end
@@ -527,6 +527,14 @@ function on_message(self, message_id, message, sender)
 		mergeTables(self, message.override)
 
 		finaiseProperties(self)
+	elseif message_id == hash("accessibility") then
+		go.set_scale(message.scale)
+		self.aimIndicator = message.aimIndicator
+		if message.aimIndicator then
+			msg.post("weapon#aimIndicator", "enable")
+		else
+			msg.post("weapon#aimIndicator", "disable")
+		end
 	end
 end
 

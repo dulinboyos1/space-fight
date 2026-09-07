@@ -7,6 +7,7 @@ function init(self)
 	self.hidden = false
 	self.size = {0,0}
 	self.colour = defaultColour
+	self.layoutExpansions = {}
 end
 
 local function grid_get(self, index)
@@ -48,11 +49,19 @@ local function hide(self, hidden)
 	end
 end
 
+local function mergeTables(base, override)
+	for key, value in pairs(override) do
+		base[key] = value
+	end
+end
+
 local function parse_grid(self, layout)
 	for i = 1, layout.metadata.size[1] do
 		self.grid[i] = {}
 	end
 	self.size = layout.metadata.size
+
+	mergeTables(layout.layout, self.layoutExpansions)
 
 	for name, data in pairs(layout.layout) do -- For each layout entry get it's name and value
 		msg.post(msg.url(nil, data.object, "menu-border"), "disable") -- Hide all menu border to start with
@@ -109,6 +118,14 @@ end
 function on_message(self, message_id, message, sender)
 	if message_id == hash("start") then -- The start message will just call the start function
 		start_grid(self, message)
+	elseif message_id == hash("start-or-update") then
+		if self.started then
+			update_grid(self, message)
+		else
+			start_grid(self, message)
+		end
+	elseif message_id == hash("layout-expansion") then -- Implemented to get past max message size
+		mergeTables(self.layoutExpansions, message)
 	elseif self.started == false then -- If not started end early
 		return
 	end

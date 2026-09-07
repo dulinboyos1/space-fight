@@ -1,8 +1,16 @@
 local alpha = 0.8
 local gap = 200
+
+local settings = require("main.settings.settings")
+
 function init(self)
 	self.scores = {0,0,0,0} -- An ordered list of scores
 	self.circles = {{}, {}, {}, {}} -- A list of circles for each player
+
+	print("Subscribing to settings changes as "..msg.url())
+	settings.subscribers[tostring(msg.url())] = msg.url() -- Add to the list of subscribers we index by url to prevent duplicates
+	
+	gui.set_scale(gui.get_node("scores"), vmath.vector3(settings.graphics.guiScale, settings.graphics.guiScale, 1))
 end
 
 function on_message(self, message_id, message, sender)
@@ -48,5 +56,17 @@ function on_message(self, message_id, message, sender)
 			end
 		end
 		self.scores[message.number] = message.score
+	elseif message_id == hash("settingsChange") then
+		-- Recalculate GUI scale
+		gui.set_scale(gui.get_node("scores"), vmath.vector3(settings.graphics.guiScale, settings.graphics.guiScale, 1))
+	elseif message_id == hash("hide") then
+		gui.set_enabled(gui.get_node("scores"), false)
+	elseif message_id == hash("show") then
+		gui.set_enabled(gui.get_node("scores"), true)
 	end
 end
+
+function final(self)
+	print("Removing subscription "..msg.url())
+	settings.subscribers[tostring(msg.url())] = nil -- Remove the subscription
+end	

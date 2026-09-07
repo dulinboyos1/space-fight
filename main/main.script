@@ -3,6 +3,8 @@
 	msg.post("@render:", "use_fixed_fit_projection", { near = -1, far = 1})
 	
 	math.randomseed(os.time())
+	math.random() -- Discard the first value
+	
 	msg.post("#main-menu", "load") -- Start main menu loading
 
 	msg.post(".", "acquire_input_focus")

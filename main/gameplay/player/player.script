@@ -5,6 +5,7 @@ go.property("number", -1)
 go.property("gamepad_id", -1)
 go.property("colour", vmath.vector4())
 
+local settings = require("main.settings.settings")
 
 function init(self)
 	-- Defined elsewhere
@@ -13,8 +14,6 @@ function init(self)
 	-- self.colour
 
 	self.modifiers = {}
-	
-	self.defaults = json.decode(sys.load_resource("/config/defaults.json"))
 end
 
 local function getByPath(table, path)
@@ -56,7 +55,7 @@ local function getModifiers(self)
 
 				local currentValue = getByPath(overrides, property.name)
 				if currentValue == nil then
-					currentValue = getByPath(self.defaults, property.name)
+					currentValue = getByPath(settings.defaults, property.name)
 					if currentValue == nil then
 						error("CRITICAL ERROR IN PARSING MODIFIER PROPERTY, "..property.name, 0)
 					end
@@ -86,7 +85,7 @@ local function getModifiers(self)
 			elseif property.type == "LIST" then
 				local currentValue = getByPath(overrides, property.name)
 				if currentValue == nil then
-					currentValue = getByPath(self.defaults, property.name)
+					currentValue = getByPath(settings.defaults, property.name)
 					if currentValue == nil then
 						error("CRITICAL ERROR IN PARSING MODIFIER PROPERTY, "..property.name, 0)
 					end
